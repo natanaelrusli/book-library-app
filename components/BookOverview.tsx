@@ -54,15 +54,19 @@ const BookOverview = ({
       </div>
 
       <div className="relative flex flex-1 justify-center">
-        <div className="relative">
+        {/* Group Wrapper for Tailwind Hover */}
+        <div className="group relative">
           <BookCover
             variant="wide"
-            className="z-10"
+            className="z-10 cursor-pointer transition-transform duration-300 hover:-rotate-6 group-hover:scale-110"
             coverColor={color}
             coverImage={cover}
           />
 
-          <div className="absolute left-16 top-10 rotate-12 opacity-40 max-sm:hidden">
+          <div
+            className="group-hover:rotate-8 absolute left-24 top-10 rotate-12 opacity-40 blur transition-all
+            duration-300 group-hover:blur-md max-sm:hidden"
+          >
             <BookCover variant="wide" coverColor={color} coverImage={cover} />
           </div>
         </div>
