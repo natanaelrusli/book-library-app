@@ -4,7 +4,7 @@ import React from "react";
 import AuthForm from "@/components/AuthForm";
 import { signUpSchema } from "@/lib/validation";
 
-const FIELD_NAMES = {
+const FIELD_NAMES: Record<string, string> = {
   email: "Email",
   password: "Password",
   fullName: "Full Name",
@@ -12,16 +12,17 @@ const FIELD_NAMES = {
   universityCard: "University Card",
 };
 
-const FIELD_TYPES = {
+const FIELD_TYPES: Record<string, string> = {
   email: "email",
   password: "password",
   fullName: "text",
   universityId: "text",
+  universityCard: "text",
 };
 
-const Page = () => (
+const Page: React.FC = () => (
   <AuthForm
-    type={"SIGN_UP"}
+    type="SIGN_UP"
     schema={signUpSchema}
     defaultValues={{
       email: "",
@@ -30,7 +31,7 @@ const Page = () => (
       universityId: 0,
       universityCard: "",
     }}
-    onSubmit={async (data: { email: string; password: string }) => {
+    onSubmit={async (data) => {
       if (data.email === "user@example.com" && data.password === "password") {
         return { success: true };
       }
