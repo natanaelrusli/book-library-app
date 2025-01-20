@@ -72,7 +72,6 @@ const ImageUpload = ({
         className={"upload-btn"}
         onClick={(e) => {
           e.preventDefault();
-
           if (ikUploadRef.current) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
@@ -93,7 +92,7 @@ const ImageUpload = ({
       </button>
 
       {file && (
-        <IKImage alt={file.name} src={file.url} width={500} height={500} />
+        <IKImage alt={file.name} src={file.url} width={500} height={300} />
       )}
     </ImageKitProvider>
   );
