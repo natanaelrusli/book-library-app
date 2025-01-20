@@ -8,6 +8,13 @@
       "when": 1737340791655,
       "tag": "0000_great_rocket_raccoon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1737355958732,
+      "tag": "0001_mean_sleeper",
+      "breakpoints": true
     }
   ]
 }

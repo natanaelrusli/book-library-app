@@ -3,6 +3,7 @@
 import React from "react";
 import AuthForm from "@/components/AuthForm";
 import { signUpSchema } from "@/lib/validation";
+import { signUp } from "@/lib/actions/auth";
 
 const FIELD_NAMES: Record<string, string> = {
   email: "Email",
@@ -31,12 +32,7 @@ const Page: React.FC = () => (
       universityId: 0,
       universityCard: "",
     }}
-    onSubmit={async (data) => {
-      if (data.email === "user@example.com" && data.password === "password") {
-        return { success: true };
-      }
-      return { success: false, error: "Invalid credentials" };
-    }}
+    onSubmit={signUp}
     FIELD_NAMES={FIELD_NAMES}
     FIELD_TYPES={FIELD_TYPES}
   />

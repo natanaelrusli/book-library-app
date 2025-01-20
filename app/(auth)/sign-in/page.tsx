@@ -3,6 +3,7 @@
 import React from "react";
 import AuthForm from "@/components/AuthForm";
 import { signInSchema } from "@/lib/validation";
+import { signInWithCredentials } from "@/lib/actions/auth";
 
 const FIELD_NAMES = {
   email: "Email",
@@ -22,12 +23,7 @@ const Page = () => (
       email: "",
       password: "",
     }}
-    onSubmit={async (data: { email: string; password: string }) => {
-      if (data.email === "user@example.com" && data.password === "password") {
-        return { success: true };
-      }
-      return { success: false, error: "Invalid credentials" };
-    }}
+    onSubmit={signInWithCredentials}
     FIELD_NAMES={FIELD_NAMES}
     FIELD_TYPES={FIELD_TYPES}
   />
