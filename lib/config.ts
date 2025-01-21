@@ -14,6 +14,8 @@ export const AppConfig = {
     upstash: {
       redisUrl: process.env.UPSTASH_REDIS_URL!,
       redisToken: process.env.UPSTASH_REDIS_TOKEN!,
+      qstashUrl: process.env.UPSTASH_QSTASH_URL!,
+      qstashToken: process.env.UPSTASH_QSTASH_TOKEN!,
     },
   },
 };
