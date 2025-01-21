@@ -2,16 +2,18 @@
 
 import React, { useRef, useState } from "react";
 import { IKImage, ImageKitProvider, IKUpload } from "imagekitio-next";
-import { config } from "@/lib/config";
+import { AppConfig } from "@/lib/config";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
 import { UploadError } from "imagekitio-next/dist/types/components/IKUpload/props";
 
-const { publicKey, urlEndpoint } = config.env.imagekit;
+const { publicKey, urlEndpoint } = AppConfig.env.imagekit;
 
 const authenticator = async () => {
   try {
-    const response = await fetch(`${config.env.apiEndpoint}/api/auth/imagekit`);
+    const response = await fetch(
+      `${AppConfig.env.apiEndpoint}/api/auth/imagekit`,
+    );
 
     if (!response.ok) {
       const errorText = await response.text();

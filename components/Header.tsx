@@ -30,6 +30,17 @@ const Header = ({ session }: { session: Session }) => {
           </Link>
         </li>
         <li>
+          <Link
+            href="/search"
+            className={cn(
+              "text-base cursor-pointer capitalize",
+              pathname === "/search" ? "text-light-200" : "text-light-100",
+            )}
+          >
+            Search
+          </Link>
+        </li>
+        <li>
           <Link href="/my-profile">
             <Avatar>
               <AvatarFallback className={"bg-amber-100"}>
