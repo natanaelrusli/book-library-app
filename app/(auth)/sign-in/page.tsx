@@ -16,17 +16,19 @@ const FIELD_TYPES = {
 };
 
 const Page = () => (
-  <AuthForm
-    type={"SIGN_IN"}
-    schema={signInSchema}
-    defaultValues={{
-      email: "",
-      password: "",
-    }}
-    onSubmit={signInWithCredentials}
-    FIELD_NAMES={FIELD_NAMES}
-    FIELD_TYPES={FIELD_TYPES}
-  />
+  <>
+    <AuthForm
+      type={"SIGN_IN"}
+      schema={signInSchema}
+      defaultValues={{
+        email: "",
+        password: "",
+      }}
+      onSubmit={signInWithCredentials}
+      FIELD_NAMES={FIELD_NAMES}
+      FIELD_TYPES={FIELD_TYPES}
+    />
+  </>
 );
 
 export default Page;
