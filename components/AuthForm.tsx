@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   DefaultValues,
@@ -25,6 +25,7 @@ import Link from "next/link";
 import ImageUpload from "@/components/ImageUpload";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import Spinner from "@/components/ui/spinner";
 
 interface Props<T extends FieldValues> {
   schema: ZodType<T>;
@@ -35,6 +36,24 @@ interface Props<T extends FieldValues> {
   FIELD_TYPES: Record<string, string>;
 }
 
+const AUTH_WORDING = {
+  success: "Success",
+  error: "Error",
+  successLogin: "You have successfully logged in",
+  successRegister: "Successfully registered",
+  welcomeBack: "Welcome back!",
+  createAccount: "Crate your account",
+  loginCaption: "Access the vast collection of resources",
+  signupCaption:
+    "Please complete all fields and upload a valid university ID to access the library",
+  signinButtonText: "Sign in",
+  signupButtonText: "Sign up",
+  signupRedirectText: "Already have an account? ",
+  signinRedirectText: "New to BookBook? ",
+  signupLinkText: "Create an account",
+  signinLinkText: "Sign in",
+};
+
 const AuthForm = <T extends FieldValues>({
   type,
   schema,
@@ -43,6 +62,8 @@ const AuthForm = <T extends FieldValues>({
   FIELD_NAMES,
   FIELD_TYPES,
 }: Props<T>) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const isSignedIn = type === "SIGN_IN";
   const router = useRouter();
 
@@ -52,34 +73,44 @@ const AuthForm = <T extends FieldValues>({
   });
 
   const handleSubmit: SubmitHandler<T> = async (data) => {
-    const result = await onSubmit(data);
+    try {
+      setIsLoading(true);
+      const result = await onSubmit(data);
 
-    if (result.success) {
-      toast({
-        title: "Success",
-        description: isSignedIn ? "You have signed in" : "Sign up successfully",
-      });
+      if (result.success) {
+        toast({
+          title: AUTH_WORDING.success,
+          description: isSignedIn
+            ? AUTH_WORDING.successLogin
+            : AUTH_WORDING.successRegister,
+        });
 
-      router.push("/");
-    } else {
+        router.push("/");
+      } else {
+        toast({
+          title: AUTH_WORDING.success,
+          description: result.error,
+          variant: "destructive",
+        });
+      }
+    } catch {
       toast({
-        title: "Error",
-        description: result.error,
+        title: AUTH_WORDING.success,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className={"flex flex-col gap-4"}>
       <h1 className={"text-2xl font-semibold text-white"}>
-        {isSignedIn ? "Welcome back!" : "Crate your account"}
+        {isSignedIn ? AUTH_WORDING.welcomeBack : AUTH_WORDING.createAccount}
       </h1>
 
       <p className={"text-light-100"}>
-        {isSignedIn
-          ? "Access the vast collection of resources"
-          : "Please complete all fields and upload a valid university ID to access the library"}
+        {isSignedIn ? AUTH_WORDING.loginCaption : AUTH_WORDING.signupCaption}
       </p>
 
       <Form {...form}>
@@ -115,20 +146,27 @@ const AuthForm = <T extends FieldValues>({
               )}
             />
           ))}
-          <Button type="submit" className={"form-btn"}>
-            {isSignedIn ? "Sign in" : "Sign Up"}
+          <Button disabled={isLoading} type="submit" className={"form-btn"}>
+            {isLoading && <Spinner />}
+            {isSignedIn
+              ? AUTH_WORDING.signinButtonText
+              : AUTH_WORDING.signupButtonText}
           </Button>
         </form>
       </Form>
 
       <p className={"text-center text-base font-medium"}>
-        {isSignedIn ? "New to BookBook? " : "Already have an account? "}
+        {isSignedIn
+          ? AUTH_WORDING.signinRedirectText
+          : AUTH_WORDING.signupRedirectText}
 
         <Link
           href={isSignedIn ? "/sign-up" : "sign-in"}
           className={"font-bold text-primary"}
         >
-          {isSignedIn ? "Create an account" : "Sign in"}
+          {isSignedIn
+            ? AUTH_WORDING.signupLinkText
+            : AUTH_WORDING.signinLinkText}
         </Link>
       </p>
     </div>

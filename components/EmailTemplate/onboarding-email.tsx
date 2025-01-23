@@ -30,7 +30,7 @@ export const OnboardingEmail: React.FC<Readonly<EmailTemplateProps>> = ({
     <div className={"my-3 flex flex-col gap-2"}>
       <p>Get started by logging in to your account:</p>
       <a href={`${AppConfig.env.appEndpoint}/sign-in`}>
-        <Button className={"w-fit"}>Login</Button>
+        <Button className={"w-fit text-black"}>Login</Button>
       </a>
     </div>
 
