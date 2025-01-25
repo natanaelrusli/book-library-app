@@ -14,12 +14,18 @@ export const signInSchema = z.object({
 });
 
 export const createBookSchema = z.object({
-  title: z.string().min(3),
-  genre: z.string().min(3),
-  author: z.string().min(3),
-  numOfBooks: z.number().min(1),
+  title: z.string().trim().min(2).max(100),
+  genre: z.string().trim().min(2).max(50),
+  author: z.string().trim().min(2).max(100),
+  description: z.string().trim().min(10).max(1000),
+  rating: z.coerce.number().min(1).max(10),
+  numOfBooks: z.coerce.number().min(1).lte(1000),
   bookImage: z.string().min(1, "Book image is required"),
-  bookColor: z.string().min(1, "Book color is required"),
-  bookVideo: z.string().optional(),
-  bookSummary: z.string().optional(),
+  bookColor: z
+    .string()
+    .trim()
+    .regex(/^#[0-9A-F]{6}$/i)
+    .min(1, "Book color is required"),
+  bookVideo: z.string(),
+  bookSummary: z.string().trim().min(10),
 });

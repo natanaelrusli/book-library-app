@@ -22,10 +22,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import ImageUpload from "@/components/ImageUpload";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/spinner";
+import FileUpload from "@/components/admin/forms/FileUpload";
 
 interface Props<T extends FieldValues> {
   schema: ZodType<T>;
@@ -130,7 +130,15 @@ const AuthForm = <T extends FieldValues>({
                   </FormLabel>
                   <FormControl>
                     {field.name === "universityCard" ? (
-                      <ImageUpload onFileChange={field.onChange} />
+                      <FileUpload
+                        variant={"dark"}
+                        folder={"/univesity-card/"}
+                        type={"image"}
+                        accept={"image"}
+                        placeholder={"Upload university Card"}
+                        onFileChange={field.onChange}
+                        value={field.value}
+                      />
                     ) : (
                       <Input
                         required

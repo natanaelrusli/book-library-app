@@ -4,6 +4,7 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
+  ControllerRenderProps,
   DefaultValues,
   FieldValues,
   Path,
@@ -21,10 +22,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Textarea } from "@/components/ui/textarea";
+import ColorPicker from "@/components/admin/ColorPicker";
+import NumberInput from "@/components/admin/NumberInput";
+
+type InputTypes = "text" | "number" | "color" | "file" | "textarea";
 
 export interface FieldDescription {
   label?: string;
   placeholder?: string;
+  type?: InputTypes;
 }
 
 interface Props<T extends FieldValues> {
@@ -32,6 +39,7 @@ interface Props<T extends FieldValues> {
   defaultValues: T;
   fieldDescriptions: Record<keyof T, FieldDescription>;
 }
+
 const CreateBookForm = <T extends FieldValues>({
   schema,
   defaultValues,
@@ -44,6 +52,22 @@ const CreateBookForm = <T extends FieldValues>({
 
   const handleSubmit: SubmitHandler<T> = async (data) => {
     console.log("handleSubmit", data);
+  };
+
+  const renderInput = (
+    type: InputTypes,
+    field: ControllerRenderProps<T, Path<T>>,
+  ) => {
+    switch (type) {
+      case "number":
+        return <NumberInput field={field} />;
+      case "color":
+        return <ColorPicker field={field} />;
+      case "textarea":
+        return <Textarea rows={5} className="book-form_input" {...field} />;
+      default:
+        return <Input type={type} className="book-form_input" {...field} />;
+    }
   };
 
   const isFieldRequired = (name: string) => {
@@ -69,16 +93,15 @@ const CreateBookForm = <T extends FieldValues>({
                   {fieldDescriptions[field.name]?.label ||
                     field.name ||
                     "Label"}
-                  {isFieldRequired(field.name) && <span>*</span>}
+                  {isFieldRequired(field.name) && (
+                    <span className="ml-1 text-red">*</span>
+                  )}
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    className="book-form_input"
-                    {...field}
-                    placeholder={
-                      fieldDescriptions[field.name]?.placeholder || ""
-                    }
-                  />
+                  {renderInput(
+                    fieldDescriptions[field.name]?.type as InputTypes,
+                    field,
+                  )}
                 </FormControl>
                 <FormMessage />
               </FormItem>

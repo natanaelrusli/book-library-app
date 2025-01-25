@@ -10,22 +10,12 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const todo = pgTable("todo", {
-  id: integer("id").primaryKey(),
-  text: text("text").notNull(),
-  done: boolean("done").default(false).notNull(),
-});
-
 export const STATUS_ENUM = pgEnum("status", [
   "PENDING",
   "APPROVED",
   "REJECTED",
 ]);
 export const ROLE_ENUM = pgEnum("role", ["USER", "ADMIN"]);
-export const BORROW_STATUS_ENUM = pgEnum("borrow_status", [
-  "BORROWED",
-  "RETURNED",
-]);
 
 export const users = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
@@ -42,4 +32,24 @@ export const users = pgTable("user", {
   createdAt: timestamp("created_at", {
     withTimezone: true,
   }).defaultNow(),
+});
+
+export const books = pgTable("book", {
+  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  title: varchar("title", {
+    length: 255,
+  }).notNull(),
+  author: varchar("author").notNull(),
+  genre: varchar("genre").notNull(),
+  rating: integer("rating").notNull().default(1),
+  totalCopies: integer("total_copies").default(0),
+  availableCopies: integer("available_copies").default(0),
+  description: varchar("description", {
+    length: 255,
+  }).notNull(),
+  color: varchar("color").notNull(),
+  cover: varchar("cover").notNull(),
+  video: varchar("video"),
+  summary: varchar("summary").notNull(),
+  isLoanedBook: boolean("is_loaned_book").default(false).notNull(),
 });
