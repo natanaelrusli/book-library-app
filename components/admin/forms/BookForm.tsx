@@ -19,33 +19,46 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import FileUpload from "@/components/admin/forms/FileUpload";
 import ColorPicker from "@/components/admin/ColorPicker";
+import Spinner from "@/components/ui/spinner";
 
 interface Props extends Partial<Book> {
   type?: "create" | "update";
   book?: Book;
+  handleSubmit: (book: z.infer<typeof createBookSchema>) => Promise<void>;
 }
 
-const BookForm = ({ type, ...book }: Props) => {
+const BookForm = ({ type, handleSubmit, ...book }: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const form: UseFormReturn<z.infer<typeof createBookSchema>> = useForm({
     resolver: zodResolver(createBookSchema),
     defaultValues: {
-      title: "",
-      genre: "",
-      author: "",
-      description: "",
+      title: "aaa",
+      genre: "aaa",
+      author: "aaa",
+      description: "aaaaaaaaaa",
       rating: 1,
       numOfBooks: 1,
-      bookImage: "",
-      bookColor: "",
+      bookImage:
+        "https://ik.imagekit.io/4q1mfykz9w/univesity-card/onboarding_PhsekidjF.png",
+      bookColor: "#fafafa",
       bookVideo: "",
-      bookSummary: "",
+      bookSummary: "aaaaaaaaaa",
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof createBookSchema>) => {};
+  const onSubmit = async (values: z.infer<typeof createBookSchema>) => {
+    try {
+      setIsLoading(true);
+      await handleSubmit(values);
+      router.push("/admin/books");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className={"flex max-w-4xl flex-col gap-4"}>
@@ -271,7 +284,12 @@ const BookForm = ({ type, ...book }: Props) => {
             )}
           />
 
-          <Button type="submit" className="book-form_btn text-white">
+          <Button
+            disabled={isLoading}
+            type="submit"
+            className="book-form_btn text-white"
+          >
+            {isLoading && <Spinner />}
             Add Book to Library
           </Button>
         </form>

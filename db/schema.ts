@@ -42,8 +42,8 @@ export const books = pgTable("book", {
   author: varchar("author").notNull(),
   genre: varchar("genre").notNull(),
   rating: integer("rating").notNull().default(1),
-  totalCopies: integer("total_copies").default(0),
-  availableCopies: integer("available_copies").default(0),
+  totalCopies: integer("total_copies"),
+  availableCopies: integer("available_copies"),
   description: varchar("description", {
     length: 255,
   }).notNull(),
@@ -52,4 +52,7 @@ export const books = pgTable("book", {
   video: varchar("video"),
   summary: varchar("summary").notNull(),
   isLoanedBook: boolean("is_loaned_book").default(false).notNull(),
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+  }).defaultNow(),
 });
