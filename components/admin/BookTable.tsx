@@ -36,11 +36,7 @@ interface BookTableProps {
   totalPages: number;
 }
 
-const BookTable = async ({
-  books,
-  currentPage,
-  totalPages,
-}: BookTableProps) => {
+const BookTable = ({ books, currentPage, totalPages }: BookTableProps) => {
   return (
     <div>
       {!books.length ? (
@@ -87,17 +83,27 @@ const BookTable = async ({
               <PaginationContent>
                 {currentPage > 1 && (
                   <PaginationItem>
-                    <PaginationPrevious href="#" />
+                    <PaginationPrevious href={`?page=${currentPage - 1}`} />
                   </PaginationItem>
                 )}
-                <PaginationItem>
-                  <PaginationLink isActive href="#">
-                    1
-                  </PaginationLink>
-                </PaginationItem>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .slice(
+                    Math.max(0, currentPage - 3), // Adjust start to ensure currentPage is centered
+                    Math.min(totalPages, currentPage + 2), // Adjust end
+                  )
+                  .map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        href={`?page=${page}`}
+                        isActive={page === currentPage}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
                 {currentPage < totalPages && (
                   <PaginationItem>
-                    <PaginationNext href={"#"} />
+                    <PaginationNext href={`?page=${currentPage + 1}`} />
                   </PaginationItem>
                 )}
               </PaginationContent>

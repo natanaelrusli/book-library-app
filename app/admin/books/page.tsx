@@ -4,11 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import BookTable from "@/components/admin/BookTable";
 import { getAllBooks } from "@/lib/actions/book";
+import { loadSearchParams } from "./searchParams";
+import type { SearchParams } from "nuqs/server";
 
-const Page = async () => {
+type PageProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+const Page = async ({ searchParams }: PageProps) => {
+  const { page } = await loadSearchParams(searchParams);
+
   const result = await getAllBooks({
-    limit: 2,
-    page: 1,
+    limit: 10,
+    page,
   });
 
   return (
