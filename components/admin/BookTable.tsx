@@ -19,16 +19,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-
-function FormattedDateCell(date: Date) {
-  const formattedDate = new Date(date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  return <TableCell>{formattedDate}</TableCell>;
-}
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { DownloadIcon, ImageIcon, ZoomIn } from "lucide-react";
+import Image from "next/image";
+import { downloadImage, formatDate } from "@/lib/utils";
 
 interface BookTableProps {
   books: Book[];
@@ -40,34 +38,73 @@ const BookTable = ({ books, currentPage, totalPages }: BookTableProps) => {
   return (
     <div>
       {!books.length ? (
-        <div className="flex h-[500px] w-full flex-col items-center justify-center gap-2">
-          <p className="text-lg font-semibold text-slate-600">
+        <div className='flex h-[500px] w-full flex-col items-center justify-center gap-2'>
+          <p className='text-lg font-semibold text-slate-600'>
             No books found.
           </p>
-          <p className="text-sm">Add a book by creating a new book</p>
+          <p className='text-sm'>Add a book by creatin a new book</p>
         </div>
       ) : (
         <>
           <Table>
-            <TableHeader className="rounded-lg bg-secondary">
+            <TableHeader className='rounded-lg bg-secondary'>
               <TableRow>
                 <TableHead>Book Title</TableHead>
                 <TableHead>Author</TableHead>
                 <TableHead>Genre</TableHead>
                 <TableHead>Date created</TableHead>
+                <TableHead>Image</TableHead>
                 <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {books.map((book) => (
                 <TableRow key={book.id}>
-                  <TableCell className="font-bold">{book.title}</TableCell>
+                  <TableCell className='font-bold'>{book.title}</TableCell>
                   <TableCell>{book.author}</TableCell>
                   <TableCell>{book.genre}</TableCell>
-                  {book.createdAt && FormattedDateCell(book.createdAt)}
+                  <TableCell>
+                    {book.createdAt ? formatDate(book.createdAt) : "-"}
+                  </TableCell>
+                  <TableCell>
+                    <Popover>
+                      <PopoverTrigger>
+                        <div className='cursor-pointer rounded-lg p-2 transition-all hover:bg-slate-400 hover:text-primary-admin'>
+                          <ImageIcon />
+                        </div>
+                      </PopoverTrigger>
+                      <PopoverContent>
+                        <div className='flex flex-col items-center gap-2'>
+                          <Image
+                            src={book.cover}
+                            alt={book.title}
+                            width={200}
+                            height={150}
+                            className='size-full'
+                          />
+                          <Button
+                            onClick={() =>
+                              downloadImage(
+                                book.cover,
+                                `${book.title}-${formatDate(new Date())}`
+                              )
+                            }
+                            className='w-full bg-primary-admin text-white hover:bg-slate-800'
+                          >
+                            <DownloadIcon />
+                            Download Image
+                          </Button>
+                          <Button className='w-full bg-primary-admin text-white hover:bg-slate-800'>
+                            <ZoomIn />
+                            Enlarge Image
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </TableCell>
                   <TableCell>
                     {
-                      <Button className="view-btn">
+                      <Button className='view-btn'>
                         <Link href={`/admin/books/${book.id}`}>
                           View Detail
                         </Link>
@@ -78,7 +115,7 @@ const BookTable = ({ books, currentPage, totalPages }: BookTableProps) => {
               ))}
             </TableBody>
           </Table>
-          <div className="mt-2">
+          <div className='mt-2'>
             <Pagination>
               <PaginationContent>
                 {currentPage > 1 && (
@@ -89,7 +126,7 @@ const BookTable = ({ books, currentPage, totalPages }: BookTableProps) => {
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                   .slice(
                     Math.max(0, currentPage - 3), // Adjust start to ensure currentPage is centered
-                    Math.min(totalPages, currentPage + 2), // Adjust end
+                    Math.min(totalPages, currentPage + 2) // Adjust end
                   )
                   .map((page) => (
                     <PaginationItem key={page}>
