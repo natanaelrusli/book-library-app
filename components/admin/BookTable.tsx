@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -27,6 +27,7 @@ import {
 import { DownloadIcon, ImageIcon, ZoomIn } from "lucide-react";
 import Image from "next/image";
 import { downloadImage, formatDate } from "@/lib/utils";
+import EnlargedImage from "../EnlargedImage";
 
 interface BookTableProps {
   books: Book[];
@@ -35,6 +36,8 @@ interface BookTableProps {
 }
 
 const BookTable = ({ books, currentPage, totalPages }: BookTableProps) => {
+  const [selectedImage, setSelectedImage] = useState<string>("");
+
   return (
     <div>
       {!books.length ? (
@@ -67,40 +70,46 @@ const BookTable = ({ books, currentPage, totalPages }: BookTableProps) => {
                     {book.createdAt ? formatDate(book.createdAt) : "-"}
                   </TableCell>
                   <TableCell>
-                    <Popover>
-                      <PopoverTrigger>
-                        <div className='cursor-pointer rounded-lg p-2 transition-all hover:bg-slate-400 hover:text-primary-admin'>
-                          <ImageIcon />
-                        </div>
-                      </PopoverTrigger>
-                      <PopoverContent>
-                        <div className='flex flex-col items-center gap-2'>
-                          <Image
-                            src={book.cover}
-                            alt={book.title}
-                            width={200}
-                            height={150}
-                            className='size-full'
-                          />
-                          <Button
-                            onClick={() =>
-                              downloadImage(
-                                book.cover,
-                                `${book.title}-${formatDate(new Date())}`
-                              )
-                            }
-                            className='w-full bg-primary-admin text-white hover:bg-slate-800'
-                          >
-                            <DownloadIcon />
-                            Download Image
-                          </Button>
-                          <Button className='w-full bg-primary-admin text-white hover:bg-slate-800'>
-                            <ZoomIn />
-                            Enlarge Image
-                          </Button>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                    {!selectedImage && (
+                      <Popover>
+                        <PopoverTrigger>
+                          <div className='cursor-pointer rounded-lg p-2 transition-all hover:bg-slate-400 hover:text-primary-admin'>
+                            <ImageIcon />
+                          </div>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                          <div className='flex flex-col items-center gap-2'>
+                            <Image
+                              src={book.cover}
+                              alt={book.title}
+                              width={200}
+                              height={150}
+                              className='size-full'
+                            />
+                            <Button
+                              onClick={() =>
+                                downloadImage(
+                                  book.cover,
+                                  `${book.title}-${formatDate(new Date())}`
+                                )
+                              }
+                              className='w-full bg-primary-admin text-white hover:bg-slate-800'
+                            >
+                              <DownloadIcon />
+                              Download Image
+                            </Button>
+
+                            <Button
+                              onClick={() => setSelectedImage(book.cover)}
+                              className='w-full bg-primary-admin text-white hover:bg-slate-800'
+                            >
+                              <ZoomIn />
+                              Enlarge Image
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    )}
                   </TableCell>
                   <TableCell>
                     {
@@ -146,6 +155,11 @@ const BookTable = ({ books, currentPage, totalPages }: BookTableProps) => {
               </PaginationContent>
             </Pagination>
           </div>
+
+          <EnlargedImage
+            onClose={() => setSelectedImage("")}
+            src={selectedImage}
+          />
         </>
       )}
     </div>

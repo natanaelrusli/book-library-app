@@ -4,9 +4,14 @@ import { db } from "@/db/drizzle";
 import { books } from "@/db/schema";
 import { z } from "zod";
 import { createBookSchema } from "@/lib/validation";
-import { count, InferModel } from "drizzle-orm";
+import { count, eq, InferModel, InferSelectModel } from "drizzle-orm";
 
 type BookInsert = InferModel<typeof books, "insert">;
+type BookSelect = InferSelectModel<typeof books>;
+interface GetBooksParams {
+  limit: number;
+  page: number;
+}
 
 export const createBook = async (values: z.infer<typeof createBookSchema>) => {
   const newBook: BookInsert = {
@@ -39,11 +44,6 @@ export const createBook = async (values: z.infer<typeof createBookSchema>) => {
   }
 };
 
-interface GetBooksParams {
-  limit: number;
-  page: number;
-}
-
 export const getAllBooks = async ({ limit, page }: GetBooksParams) => {
   // Fetch the total count of books
   const totalBooks = await db.select({ count: count() }).from(books);
@@ -64,4 +64,10 @@ export const getAllBooks = async ({ limit, page }: GetBooksParams) => {
     totalPages, // Add the total pages count to the result
     currentPage: page,
   };
+};
+
+export const getBookById = async (id: string): Promise<BookSelect> => {
+  const book = await db.select().from(books).where(eq(books.id, id));
+
+  return book[0];
 };
