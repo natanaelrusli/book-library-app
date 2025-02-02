@@ -27,7 +27,7 @@ export default async function Page({
         {/* Top image and data section */}
         <div className='flex gap-6'>
           <div
-            className='rounded-md px-24 py-5'
+            className='flex items-center justify-center rounded-md px-24 py-5'
             style={{
               backgroundColor: book.color,
             }}
@@ -63,8 +63,11 @@ export default async function Page({
             </div>
 
             <Button
-              className='w-80 bg-primary-admin text-white hover:bg-slate-800'
+              className='bg-primary-admin text-white hover:bg-slate-800'
               size='lg'
+              style={{
+                width: 450,
+              }}
             >
               <Edit />
               Edit Book
@@ -73,6 +76,7 @@ export default async function Page({
         </div>
         {/* Top image and data section end */}
 
+        {/* Split into 2 column, right column will be for book trailer video */}
         <div className='mt-6 w-7/12'>
           <div className='mb-3 font-bold text-dark-400'>Summary</div>
           <p className='text-dark-600'>{book.summary}</p>

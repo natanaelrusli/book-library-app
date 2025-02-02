@@ -84,7 +84,7 @@ const BookTable = ({ books, currentPage, totalPages }: BookTableProps) => {
                               alt={book.title}
                               width={200}
                               height={150}
-                              className='size-full'
+                              className='size-full max-h-80 object-contain'
                             />
                             <Button
                               onClick={() =>
