@@ -27,24 +27,23 @@ interface Props extends Partial<Book> {
   handleSubmit: (book: z.infer<typeof createBookSchema>) => Promise<void>;
 }
 
-const BookForm = ({ type, handleSubmit, ...book }: Props) => {
+const BookForm = ({ type, handleSubmit, book }: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const form: UseFormReturn<z.infer<typeof createBookSchema>> = useForm({
     resolver: zodResolver(createBookSchema),
     defaultValues: {
-      title: "aaa",
-      genre: "aaa",
-      author: "aaa",
-      description: "aaaaaaaaaa",
-      rating: 1,
-      numOfBooks: 1,
-      bookImage:
-        "https://ik.imagekit.io/4q1mfykz9w/univesity-card/onboarding_PhsekidjF.png",
-      bookColor: "#fafafa",
-      bookVideo: "",
-      bookSummary: "aaaaaaaaaa",
+      title: book?.title || "",
+      genre: book?.genre || "",
+      author: book?.author || "",
+      description: book?.description || "",
+      rating: book?.rating || 1,
+      numOfBooks: book?.availableCopies || 1,
+      bookImage: book?.cover || "",
+      bookColor: book?.color || "#fafafa",
+      bookVideo: book?.video || "",
+      bookSummary: book?.summary || "",
     },
   });
 
@@ -52,7 +51,12 @@ const BookForm = ({ type, handleSubmit, ...book }: Props) => {
     try {
       setIsLoading(true);
       await handleSubmit(values);
-      router.push("/admin/books");
+
+      if (type === "create") {
+        router.push("/admin/books");
+      } else {
+        router.push(`/admin/books/${book?.id}`);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -290,7 +294,7 @@ const BookForm = ({ type, handleSubmit, ...book }: Props) => {
             className="book-form_btn text-white"
           >
             {isLoading && <Spinner />}
-            Add Book to Library
+            {type === "update" ? "Update Book" : "Add Book to Library"}
           </Button>
         </form>
       </Form>
