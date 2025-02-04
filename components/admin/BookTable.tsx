@@ -95,7 +95,18 @@ const BookTable = ({
             <TableBody>
               {books.map((book) => (
                 <TableRow key={book.id}>
-                  <TableCell className='font-bold'>{book.title}</TableCell>
+                  <TableCell className='font-bold'>
+                    <div className='flex items-center gap-3'>
+                      <Image
+                        src={book.cover}
+                        alt='cover image'
+                        width={100}
+                        height={200}
+                        className='w-[40px]'
+                      />
+                      {book.title}
+                    </div>
+                  </TableCell>
                   <TableCell>{book.author}</TableCell>
                   <TableCell>{book.genre}</TableCell>
                   <TableCell>
@@ -146,7 +157,10 @@ const BookTable = ({
                   <TableCell className='flex gap-2'>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant='outline'>...</Button>
+                        {/* i want to center the button below without using padding */}
+                        <div className='mt-3 flex justify-center'>
+                          <Button variant='outline'>...</Button>
+                        </div>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className='w-56'>
                         <DropdownMenuGroup>
