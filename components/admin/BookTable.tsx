@@ -2,6 +2,14 @@
 
 import React, { useState } from "react";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Table,
   TableBody,
   TableCell,
@@ -28,15 +36,39 @@ import { DownloadIcon, ImageIcon, ZoomIn } from "lucide-react";
 import Image from "next/image";
 import { downloadImage, formatDate } from "@/lib/utils";
 import EnlargedImage from "../EnlargedImage";
+import { toast } from "@/hooks/use-toast";
 
 interface BookTableProps {
   books: Book[];
   currentPage: number;
   totalPages: number;
+  onDelete: (id: string) => Promise<void>;
 }
 
-const BookTable = ({ books, currentPage, totalPages }: BookTableProps) => {
+const BookTable = ({
+  books,
+  currentPage,
+  totalPages,
+  onDelete,
+}: BookTableProps) => {
   const [selectedImage, setSelectedImage] = useState<string>("");
+
+  const handleDelete = async (id: string) => {
+    try {
+      await onDelete(id);
+
+      toast({
+        title: "Book deleted successfully",
+        description: "The book has been deleted successfully",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "An error occurred",
+        description: "An error occurred while deleting the book",
+      });
+    }
+  };
 
   return (
     <div>
@@ -111,19 +143,39 @@ const BookTable = ({ books, currentPage, totalPages }: BookTableProps) => {
                       </Popover>
                     )}
                   </TableCell>
-                  <TableCell>
-                    {
-                      <Button className='view-btn'>
-                        <Link href={`/admin/books/${book.id}`}>
-                          View Detail
-                        </Link>
-                      </Button>
-                    }
+                  <TableCell className='flex gap-2'>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant='outline'>...</Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className='w-56'>
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem>
+                            <Link
+                              href={`/admin/books/${book.id}`}
+                              className='flex w-full cursor-pointer items-center justify-between'
+                            >
+                              View Detail
+                              <DropdownMenuShortcut>⇧⌘O</DropdownMenuShortcut>
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(book.id)}
+                          >
+                            <div className='flex w-full cursor-pointer items-center text-red-600'>
+                              Delete Book
+                              <DropdownMenuShortcut>⇧⌘D</DropdownMenuShortcut>
+                            </div>
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+
           <div className='mt-2'>
             <Pagination>
               <PaginationContent>

@@ -7,13 +7,15 @@ import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
 import { UploadError } from "imagekitio-next/dist/types/components/IKUpload/props";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import ProgressBar from "@/components/ProgressBar";
 
 const { publicKey, urlEndpoint } = AppConfig.env.imagekit;
 
 const authenticator = async () => {
   try {
     const response = await fetch(
-      `${AppConfig.env.apiEndpoint}/api/auth/imagekit`,
+      `${AppConfig.env.apiEndpoint}/api/auth/imagekit`
     );
 
     if (!response.ok) {
@@ -56,6 +58,7 @@ const FileUpload = ({
     url: value,
     name: value,
   });
+  const [showVideo, setShowVideo] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
 
   const styles = {
@@ -65,6 +68,25 @@ const FileUpload = ({
         : "bg-light-600 border-gray-100 border",
     placeholder: variant === "dark" ? "text-light-100" : "text-slate-500",
     text: variant === "dark" ? "text-light-100" : "text-dark-400",
+  };
+
+  const renderVideo = () => {
+    if (file && type === "video" && showVideo) {
+      return (
+        <video width='1200' height='240' controls>
+          <source src={file.url} type='video/mp4'></source>
+        </video>
+      );
+    } else {
+      return (
+        <Button
+          className='bg-primary-admin text-white hover:bg-primary-admin'
+          onClick={() => setShowVideo(!showVideo)}
+        >
+          Show Video
+        </Button>
+      );
+    }
   };
 
   const onError = (error: UploadError) => {
@@ -145,8 +167,8 @@ const FileUpload = ({
         }}
       >
         <Image
-          src="/icons/upload.svg"
-          alt="upload-icon"
+          src='/icons/upload.svg'
+          alt='upload-icon'
           width={20}
           height={20}
           className={"object-contain"}
@@ -156,33 +178,26 @@ const FileUpload = ({
         </p>
 
         {file && (
-          <p className="upload-filename ml-6 max-w-36 truncate">{file.name}</p>
+          <p className='upload-filename ml-6 max-w-36 truncate'>{file.name}</p>
         )}
       </button>
-      <div className="h-3 w-full bg-red">
-        <div
-          style={{
-            width: `${progress}%`,
-          }}
-          className={`h-full bg-blue-100`}
-        />
-      </div>
 
-      {progress > 0 && <p>{progress} %</p>}
+      <ProgressBar progress={progress} />
+
+      {file && <p className={cn("upload-filename", styles.text)}>{file.url}</p>}
 
       {file &&
         (type === "image" && value ? (
-          <IKImage alt={file.name} src={file.url} width={500} height={300} />
+          <IKImage
+            alt={file.name}
+            src={file.url}
+            width={200}
+            height={300}
+            className='mb-6 max-w-[200px] object-contain'
+          />
         ) : (
-          type === "video" &&
-          value && (
-            <video width="1200" height="240" controls>
-              <source src={file.url} type="video/mp4"></source>
-            </video>
-          )
+          type === "video" && value && renderVideo()
         ))}
-
-      {file && <p className={cn("upload-filename", styles.text)}>{file.url}</p>}
     </ImageKitProvider>
   );
 };

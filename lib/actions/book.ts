@@ -84,6 +84,7 @@ export const updateBook = async (book: BookInsert): Promise<BookSelect> => {
         rating: book.rating,
         totalCopies: book.totalCopies,
         cover: book.cover,
+        color: book.color,
         video: book.video,
         summary: book.summary,
         description: book.description,
@@ -96,5 +97,14 @@ export const updateBook = async (book: BookInsert): Promise<BookSelect> => {
   } catch (error) {
     console.error("Failed to update book:", error);
     throw new Error("Failed to update book.");
+  }
+};
+
+export const deleteBook = async (id: string): Promise<void> => {
+  try {
+    await db.delete(books).where(eq(books.id, id));
+  } catch (error) {
+    console.error("Failed to delete book:", error);
+    throw new Error("Failed to delete book.");
   }
 };

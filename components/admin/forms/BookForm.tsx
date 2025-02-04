@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import FileUpload from "@/components/admin/forms/FileUpload";
 import ColorPicker from "@/components/admin/ColorPicker";
 import Spinner from "@/components/ui/spinner";
+import { toast } from "@/hooks/use-toast";
 
 interface Props extends Partial<Book> {
   type?: "create" | "update";
@@ -55,6 +56,10 @@ const BookForm = ({ type, handleSubmit, book }: Props) => {
       if (type === "create") {
         router.push("/admin/books");
       } else {
+        toast({
+          title: "Success",
+          description: `${values.title} updated successfully`,
+        });
         router.push(`/admin/books/${book?.id}`);
       }
     } catch (error) {

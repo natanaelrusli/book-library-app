@@ -14,15 +14,15 @@ const EditBook = async ({ params }: { params: Promise<{ id: string }> }) => {
   const handleUpdateBook = async (book: z.infer<typeof createBookSchema>) => {
     "use server";
 
-    const updatedBook = await updateBook({
+    await updateBook({
       id: id,
       totalCopies: book.numOfBooks,
       cover: book.bookImage,
       video: book.bookVideo,
       summary: book.bookSummary,
+      color: book.bookColor,
       ...book,
     } as unknown as BookInsert);
-    console.log("updatedBook", updatedBook);
   };
 
   return (
@@ -37,7 +37,9 @@ const EditBook = async ({ params }: { params: Promise<{ id: string }> }) => {
       </div>
 
       <div className="mb-6">
-        <p>Editing {book.title}</p>
+        <h2 className="font-ibm-plex-sans text-xl font-bold text-slate-800">
+          Editing {book.title}
+        </h2>
       </div>
 
       <BookForm book={book} type="update" handleSubmit={handleUpdateBook} />

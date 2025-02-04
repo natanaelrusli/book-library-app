@@ -32,16 +32,16 @@ const Page = () => {
 
   return (
     <div>
-      <div className="mb-6">
-        <Link href="/admin/books">
-          <Button variant="outline">
+      <div className='mb-6'>
+        <Link href='/admin/books'>
+          <Button variant='outline'>
             <ArrowLeft />
             Go Back
           </Button>
         </Link>
       </div>
 
-      <BookForm handleSubmit={handleSubmitBook} />
+      <BookForm type='create' handleSubmit={handleSubmitBook} />
     </div>
   );
 };
