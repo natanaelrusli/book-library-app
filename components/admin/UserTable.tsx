@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
+import Image from "next/image";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { Empty } from "antd";
+import { FolderOpenIcon, SortAsc, Trash2Icon } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { formatDate } from "@/lib/utils";
+import { User } from "@/types";
+import DeleteConfirmModal from "@/components/admin/DeleteConfirmModal";
 import {
   Pagination,
   PaginationContent,
@@ -17,22 +18,21 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
 import { Button } from "../ui/button";
-import { SortAsc, Trash2Icon } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { formatDate } from "@/lib/utils";
-import { User } from "@/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import Image from "next/image";
-import { Empty } from "antd";
-import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { toast } from "@/hooks/use-toast";
-import DeleteConfirmModal from "./DeleteConfirmModal";
 
 type UserTableProps = {
   users: User[];
@@ -151,7 +151,7 @@ const UserTable = ({
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant='link' className='text-primary-admin'>
-                          Show ID Card
+                          <FolderOpenIcon /> Show ID Card
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className='flex w-fit flex-col gap-2 p-2'>

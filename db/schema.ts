@@ -15,7 +15,19 @@ export const STATUS_ENUM = pgEnum("status", [
   "APPROVED",
   "REJECTED",
 ]);
+
+export enum StatusEnum {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}
+
 export const ROLE_ENUM = pgEnum("role", ["USER", "ADMIN"]);
+
+export enum RoleEnum {
+  USER = "USER",
+  ADMIN = "ADMIN",
+}
 
 export const users = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom().unique(),

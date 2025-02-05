@@ -1,8 +1,13 @@
-import { getAllUsers } from "@/lib/actions/user";
 import React from "react";
+import { StatusEnum } from "@/db/schema";
+import { getUserByStatus } from "@/lib/actions/user";
 
 const Page = async () => {
-  const data = await getAllUsers({ limit: 10, page: 1 });
+  const data = await getUserByStatus({
+    limit: 10,
+    page: 1,
+    status: StatusEnum.PENDING,
+  });
 
   return (
     <div>
