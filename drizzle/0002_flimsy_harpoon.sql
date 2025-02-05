@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "book_borrowed" integer DEFAULT 0;

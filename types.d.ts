@@ -1,3 +1,6 @@
+import { InferModel } from "drizzle-orm";
+import { users } from "./db/schema";
+
 interface Book {
   id: string;
   title: string;
@@ -22,3 +25,5 @@ interface AuthCredentials {
   universityId: number;
   universityCard: string;
 }
+
+type User = InferModel<typeof users>;
