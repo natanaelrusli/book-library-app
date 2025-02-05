@@ -9,31 +9,24 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Trash2Icon } from "lucide-react";
 import { Button } from "../ui/button";
+import Spinner from "../ui/spinner";
 
 interface DeleteConfirmModalProps {
-  userId: string;
-  onDelete: (id: string) => Promise<void>;
+  onDelete: () => Promise<void>;
   loading?: boolean;
   isOpen: boolean;
   onClose: () => void;
 }
 
 const DeleteConfirmModal = ({
-  onDelete,
-  userId,
   loading = false,
   isOpen,
   onClose,
+  onDelete,
 }: DeleteConfirmModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogTrigger asChild>
-        <div className='cursor-pointer text-red-400'>
-          <Trash2Icon />
-        </div>
-      </DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
           <DialogTitle>Delete User</DialogTitle>
@@ -52,11 +45,12 @@ const DeleteConfirmModal = ({
             variant='destructive'
             type='submit'
             disabled={loading}
-            onClick={() => {
-              onDelete(userId);
+            onClick={async () => {
+              await onDelete();
               onClose();
             }}
           >
+            {loading && <Spinner />}
             Yes
           </Button>
         </DialogFooter>

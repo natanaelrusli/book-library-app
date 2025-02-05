@@ -32,6 +32,7 @@ import { Empty } from "antd";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 type UserTableProps = {
   users: User[];
@@ -47,12 +48,20 @@ const UserTable = ({
   onDelete,
 }: UserTableProps) => {
   const { data: session } = useSession();
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async (id: string) => {
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
+
+  const handleDeleteClick = (id: string) => {
+    setSelectedUserId(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await onDelete(id);
+      await onDelete(selectedUserId);
       toast({
         title: "User deleted!",
       });
@@ -160,11 +169,10 @@ const UserTable = ({
                     {session?.user?.id === user.id ? null : (
                       <Button
                         variant='link'
-                        className='text-red-500'
-                        onClick={() => handleDelete(user.id)}
+                        onClick={() => handleDeleteClick(user.id)}
                         disabled={isDeleting}
                       >
-                        <Trash2Icon size={20} />
+                        <Trash2Icon className='text-red-500' size={20} />
                       </Button>
                     )}
                   </TableCell>
@@ -206,6 +214,13 @@ const UserTable = ({
           </PaginationContent>
         </Pagination>
       </div>
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onDelete={handleDelete}
+        loading={isDeleting}
+      />
     </div>
   );
 };
