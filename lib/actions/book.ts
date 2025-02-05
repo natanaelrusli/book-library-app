@@ -5,6 +5,7 @@ import { books } from "@/db/schema";
 import { z } from "zod";
 import { createBookSchema } from "@/lib/validation";
 import { count, eq, InferModel, InferSelectModel } from "drizzle-orm";
+import { Book } from "@/types";
 
 export type BookInsert = InferModel<typeof books, "insert">;
 type BookSelect = InferSelectModel<typeof books>;
@@ -100,11 +101,14 @@ export const updateBook = async (book: BookInsert): Promise<BookSelect> => {
   }
 };
 
-export const deleteBook = async (id: string): Promise<void> => {
+export const deleteBookById = async (
+  id: string
+): Promise<{ success: boolean }> => {
   try {
     await db.delete(books).where(eq(books.id, id));
+    return { success: true };
   } catch (error) {
     console.error("Failed to delete book:", error);
-    throw new Error("Failed to delete book.");
+    return { success: false };
   }
 };

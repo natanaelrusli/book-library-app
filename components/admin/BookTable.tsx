@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Rate } from "antd";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +38,7 @@ import Image from "next/image";
 import { downloadImage, formatDate } from "@/lib/utils";
 import EnlargedImage from "../EnlargedImage";
 import { toast } from "@/hooks/use-toast";
+import { Book } from "@/types";
 
 interface BookTableProps {
   books: Book[];
@@ -87,6 +89,7 @@ const BookTable = ({
                 <TableHead>Book Title</TableHead>
                 <TableHead>Author</TableHead>
                 <TableHead>Genre</TableHead>
+                <TableHead>Rating</TableHead>
                 <TableHead>Date created</TableHead>
                 <TableHead>Image</TableHead>
                 <TableHead>Action</TableHead>
@@ -109,6 +112,9 @@ const BookTable = ({
                   </TableCell>
                   <TableCell>{book.author}</TableCell>
                   <TableCell>{book.genre}</TableCell>
+                  <TableCell>
+                    <Rate disabled defaultValue={book.rating} />
+                  </TableCell>
                   <TableCell>
                     {book.createdAt ? formatDate(book.createdAt) : "-"}
                   </TableCell>
