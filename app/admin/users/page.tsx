@@ -1,10 +1,14 @@
 import React from "react";
 import UserTable from "@/components/admin/UserTable";
 import { Card } from "@/components/ui/card";
-import { deleteUserById, getAllUsers, updateUserRole } from "@/lib/actions/user";
+import {
+  deleteUserById,
+  getUserByStatus,
+  updateUserRole,
+} from "@/lib/actions/user";
 import { revalidatePath } from "next/cache";
 import { toast } from "@/hooks/use-toast";
-import { RoleEnum } from "@/db/schema";
+import { RoleEnum, StatusEnum } from "@/db/schema";
 
 export const metadata = {
   title: "BookBook - All Users",
@@ -12,7 +16,11 @@ export const metadata = {
 };
 
 const Page = async () => {
-  const data = await getAllUsers({ limit: 10, page: 1 });
+  const data = await getUserByStatus({
+    limit: 10,
+    page: 1,
+    status: StatusEnum.APPROVED,
+  });
 
   const handleDelete = async (userId: string) => {
     "use server";
@@ -31,7 +39,13 @@ const Page = async () => {
     revalidatePath("/admin/books");
   };
 
-  const handleRoleUpdate = async ({ userId, role }: {userId: string, role: RoleEnum}) => {
+  const handleRoleUpdate = async ({
+    userId,
+    role,
+  }: {
+    userId: string;
+    role: RoleEnum;
+  }) => {
     "use server";
     const res = await updateUserRole({
       userId,
@@ -47,10 +61,10 @@ const Page = async () => {
     }
 
     revalidatePath("/admin/users");
-  }
+  };
 
   return (
-    <Card className='p-6'>
+    <Card className="p-6">
       <UserTable
         users={data.users}
         currentPage={data.currentPage}

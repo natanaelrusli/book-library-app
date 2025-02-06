@@ -66,7 +66,10 @@ export const getUserByStatus = async ({
   page,
   status,
 }: GetUserByStatusParams) => {
-  const totalUserCount = await db.select({ count: count() }).from(users);
+  const totalUserCount = await db
+    .select({ count: count() })
+    .from(users)
+    .where(eq(users.status, status));
 
   const totalRecords = totalUserCount[0]?.count || 0;
   const totalPages = Math.ceil(totalRecords / limit);

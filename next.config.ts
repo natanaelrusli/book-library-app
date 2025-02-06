@@ -22,6 +22,11 @@ const nextConfig: NextConfig = {
         hostname: "ik.imagekit.io",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "dummyimage.com",
+        port: "",
+      },
     ],
   },
 };

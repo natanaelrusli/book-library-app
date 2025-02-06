@@ -8,9 +8,10 @@ import { signIn } from "@/auth";
 import { headers } from "next/headers";
 import ratelimit from "@/lib/ratelimit";
 import { redirect } from "next/navigation";
+import { AuthCredentials } from "@/types";
 
 export const signInWithCredentials = async (
-  params: Pick<AuthCredentials, "email" | "password">,
+  params: Pick<AuthCredentials, "email" | "password">
 ) => {
   const { email, password } = params;
 

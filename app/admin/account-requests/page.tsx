@@ -4,16 +4,24 @@ import { getUserByStatus, updateUserStatus } from "@/lib/actions/user";
 import AccountRequestTable from "@/components/admin/AccountRequestTable";
 import { Card } from "@/components/ui/card";
 import { revalidatePath } from "next/cache";
+import { loadSearchParams } from "./searchParams";
+import { SearchParams } from "nuqs/server";
 
 export const metadata = {
   title: "BookBook - Account Requests",
   description: "View and manage account requests",
 };
 
-const Page = async () => {
+type PageProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+const Page = async ({ searchParams }: PageProps) => {
+  const { page } = await loadSearchParams(searchParams);
+
   const data = await getUserByStatus({
     limit: 10,
-    page: 1,
+    page,
     status: StatusEnum.PENDING,
   });
 
