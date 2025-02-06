@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { StatusEnum, users } from "@/db/schema";
+import { RoleEnum, StatusEnum, users } from "@/db/schema";
 import { User } from "@/types";
 import { count, eq } from "drizzle-orm";
 
@@ -94,3 +94,29 @@ export const deleteUserById = async ({ userId }: DeleteUserParams) => {
     return { success: false };
   }
 };
+
+export const updateUserStatus = async ({
+  userId,
+  status,
+}: {
+  userId: string;
+  status: StatusEnum;
+}) => {
+  try {
+    await db.update(users).set({ status }).where(eq(users.id, userId));
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to update user status:", error);
+    return { success: false };
+  }
+};
+
+export const updateUserRole = async ({ userId, role }: { userId: string; role: RoleEnum }) => {
+  try {
+    await db.update(users).set({ role }).where(eq(users.id, userId));
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to update user role:", error);
+    return { success: false };
+  }
+}

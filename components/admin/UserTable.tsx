@@ -5,9 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Empty } from "antd";
-import { FolderOpenIcon, SortAsc, Trash2Icon } from "lucide-react";
+import { Check, FolderOpenIcon, SortAsc, Trash2Icon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { User } from "@/types";
 import DeleteConfirmModal from "@/components/admin/DeleteConfirmModal";
 import {
@@ -33,12 +33,14 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { RoleEnum } from "@/db/schema";
 
 type UserTableProps = {
   users: User[];
   currentPage: number;
   totalPages: number;
   onDelete: (id: string) => Promise<void>;
+  onRoleUpdate: ({ userId, role }: {userId: string, role: RoleEnum}) => Promise<void>;
 };
 
 const UserTable = ({
@@ -46,10 +48,14 @@ const UserTable = ({
   currentPage,
   totalPages,
   onDelete,
+  onRoleUpdate
 }: UserTableProps) => {
   const { data: session } = useSession();
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
 
@@ -75,6 +81,50 @@ const UserTable = ({
     }
   };
 
+  const handleRoleUpdate = async (userId: string, roleEnum: string) => {
+    try {
+      setIsLoading({
+        ...isLoading,
+        ["role" + userId]: true,
+      });
+      toast({
+        title: "Updating user role...",
+      });
+      
+      await onRoleUpdate({
+        userId,
+        role: roleEnum as RoleEnum,
+      });
+
+      toast({
+        title: "User role updated!",
+      });
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Failed to update user role",
+      });
+    } finally {
+      setIsLoading({
+        ...isLoading,
+        ["role" + userId]: false,
+      });
+    }
+  }
+
+  const getRoleBadgeColor = (role: RoleEnum) => {
+    const defaultStyling = "cursor-pointer rounded-lg";
+
+    switch (role) {
+      case RoleEnum.ADMIN:
+        return cn(`${defaultStyling} bg-red-200 text-red-800`);
+      case RoleEnum.USER:
+        return cn(`${defaultStyling} bg-green-200 text-green-800`);
+      default:
+        return defaultStyling;
+    }
+  };
+
   const renderEmptyState = () => {
     if (users.length > 0) return null;
 
@@ -87,6 +137,35 @@ const UserTable = ({
           </Button>
         </Link>
       </div>
+    );
+  };
+
+  const UserStatusDropdown = ({userId, role }: { userId: string, role: RoleEnum }) => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Badge
+            variant="outline"
+            className={getRoleBadgeColor(role as RoleEnum)}
+          >
+            {role}
+          </Badge>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="flex w-fit flex-col gap-1 p-3">
+          {Object.values(RoleEnum).map((roleEnum) => (
+            <button
+              key={roleEnum}
+              disabled={role === roleEnum}
+              onClick={() => handleRoleUpdate(userId, roleEnum)}
+            >
+              <div className="flex w-full cursor-pointer items-center justify-between p-2 text-sm font-semibold hover:cursor-pointer hover:rounded-lg hover:bg-gray-50">
+                {roleEnum}
+                {role === roleEnum ? <Check className="size-3" /> : null}
+              </div>
+            </button>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   };
 
@@ -128,30 +207,20 @@ const UserTable = ({
                   <TableCell>
                     {user.createdAt && formatDate(user.createdAt)}
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Badge className='cursor-pointer bg-primary-admin text-white hover:bg-primary-admin'>
-                          {user.role}
-                        </Badge>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className='flex w-fit flex-col gap-2 p-2'>
-                        <Badge variant='outline' className='cursor-pointer'>
-                          Admin
-                        </Badge>
-                        <Badge variant='outline' className='cursor-pointer'>
-                          User
-                        </Badge>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                    <TableCell>
+                      <UserStatusDropdown userId={user.id} role={user.role as RoleEnum} />
+                    </TableCell>
                   <TableCell>{user.booksBorrowed || 0}</TableCell>
                   <TableCell>{user.universityId}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant='link' className='text-primary-admin'>
-                          <FolderOpenIcon /> Show ID Card
+                        <Button
+                          role='button'
+                          variant='link'
+                          className='text-primary-admin'
+                        >
+                          <span>Show ID Card</span> <FolderOpenIcon />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className='flex w-fit flex-col gap-2 p-2'>
