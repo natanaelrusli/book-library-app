@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
-import { SortAsc, FolderOpenIcon, CrossIcon } from "lucide-react";
+import { SortAsc, FolderOpenIcon, CrossIcon, SortDesc } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import {
@@ -35,7 +35,7 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { toast } from "@/hooks/use-toast";
-import { useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import Spinner from "../ui/spinner";
 
 type AccountRequestTableProps = {
@@ -135,13 +135,33 @@ const AccountRequestTable = ({
   const handleReject = async (userId: string) =>
     await handleAction(userId, "reject");
 
+  const handleSortDirectionChange = () => {
+    const newSortDirection = sortDirection === "asc" ? "desc" : "asc";
+
+    redirect(
+      constructUrl("/admin/account-requests", {
+        page: parseInt(page || "1"),
+        sortBy: sortBy || "fullName",
+        sortDirection: newSortDirection,
+      })
+    );
+  };
+
   return (
     <div>
       <div className="flex w-full items-center justify-between">
         <h1 className="text-2xl font-bold">Account Requests</h1>
 
-        <Button variant="outline">
-          A - Z <SortAsc />
+        <Button variant="outline" onClick={handleSortDirectionChange}>
+          {sortDirection === "desc" ? (
+            <>
+              A - Z <SortAsc />
+            </>
+          ) : (
+            <>
+              Z - A <SortDesc />
+            </>
+          )}
         </Button>
       </div>
 
