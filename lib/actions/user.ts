@@ -111,7 +111,13 @@ export const updateUserStatus = async ({
   }
 };
 
-export const updateUserRole = async ({ userId, role }: { userId: string; role: RoleEnum }) => {
+export const updateUserRole = async ({
+  userId,
+  role,
+}: {
+  userId: string;
+  role: RoleEnum;
+}) => {
   try {
     await db.update(users).set({ role }).where(eq(users.id, userId));
     return { success: true };
@@ -119,4 +125,4 @@ export const updateUserRole = async ({ userId, role }: { userId: string; role: R
     console.error("Failed to update user role:", error);
     return { success: false };
   }
-}
+};

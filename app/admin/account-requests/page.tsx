@@ -1,6 +1,9 @@
 import React from "react";
 import { StatusEnum } from "@/db/schema";
-import { getUserByStatus } from "@/lib/actions/user";
+import { getUserByStatus, updateUserStatus } from "@/lib/actions/user";
+import AccountRequestTable from "@/components/admin/AccountRequestTable";
+import { Card } from "@/components/ui/card";
+import { revalidatePath } from "next/cache";
 
 export const metadata = {
   title: "BookBook - Account Requests",
@@ -14,11 +17,28 @@ const Page = async () => {
     status: StatusEnum.PENDING,
   });
 
+  const handleApprove = async (userId: string) => {
+    "use server";
+    await updateUserStatus({ userId, status: StatusEnum.APPROVED });
+    revalidatePath("/admin/account-requests");
+  };
+
+  const handleReject = async (userId: string) => {
+    "use server";
+    await updateUserStatus({ userId, status: StatusEnum.REJECTED });
+    revalidatePath("/admin/account-requests");
+  };
+
   return (
-    <div>
-      <p>There are {data.users.length} users</p>
-      <pre>{JSON.stringify(data.users, null, 2)}</pre>
-    </div>
+    <Card className="p-6">
+      <AccountRequestTable
+        users={data.users}
+        currentPage={data.currentPage}
+        totalPages={data.totalPages}
+        onApprove={handleApprove}
+        onReject={handleReject}
+      />
+    </Card>
   );
 };
 
