@@ -1,8 +1,9 @@
-import { parseAsInteger, createLoader } from "nuqs/server";
+import { parseAsInteger, createLoader, parseAsString } from "nuqs/server";
 
-// Describe your search params, and reuse this in useQueryStates / createSerializer:
 export const userRequestSearchParams = {
   page: parseAsInteger.withDefault(1),
+  sortBy: parseAsString.withDefault("fullName"),
+  sortDirection: parseAsString.withDefault("asc"),
 };
 
 export const loadSearchParams = createLoader(userRequestSearchParams);

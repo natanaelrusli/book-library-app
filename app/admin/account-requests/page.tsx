@@ -1,6 +1,10 @@
 import React from "react";
 import { StatusEnum } from "@/db/schema";
-import { getUserByStatus, updateUserStatus } from "@/lib/actions/user";
+import {
+  getUserByStatus,
+  SortByEnum,
+  updateUserStatus,
+} from "@/lib/actions/user";
 import AccountRequestTable from "@/components/admin/AccountRequestTable";
 import { Card } from "@/components/ui/card";
 import { revalidatePath } from "next/cache";
@@ -17,12 +21,14 @@ type PageProps = {
 };
 
 const Page = async ({ searchParams }: PageProps) => {
-  const { page } = await loadSearchParams(searchParams);
+  const { page, sortBy, sortDirection } = await loadSearchParams(searchParams);
 
   const data = await getUserByStatus({
     limit: 10,
     page,
     status: StatusEnum.PENDING,
+    sortBy: sortBy as SortByEnum,
+    sortDirection: sortDirection as "asc" | "desc",
   });
 
   const handleApprove = async (userId: string) => {

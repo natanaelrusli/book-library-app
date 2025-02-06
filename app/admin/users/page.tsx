@@ -9,16 +9,24 @@ import {
 import { revalidatePath } from "next/cache";
 import { toast } from "@/hooks/use-toast";
 import { RoleEnum, StatusEnum } from "@/db/schema";
+import { SearchParams } from "nuqs/server";
+import { loadSearchParams } from "./searchParams";
 
 export const metadata = {
   title: "BookBook - All Users",
   description: "View and manage user accounts",
 };
 
-const Page = async () => {
+type PageProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+const Page = async ({ searchParams }: PageProps) => {
+  const { page } = await loadSearchParams(searchParams);
+
   const data = await getUserByStatus({
     limit: 10,
-    page: 1,
+    page,
     status: StatusEnum.APPROVED,
   });
 

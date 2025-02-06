@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SortAsc, FolderOpenIcon, CrossIcon } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   PaginationContent,
   PaginationItem,
@@ -35,6 +35,8 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { toast } from "@/hooks/use-toast";
+import { useSearchParams } from "next/navigation";
+import Spinner from "../ui/spinner";
 
 type AccountRequestTableProps = {
   users: User[];
@@ -44,6 +46,19 @@ type AccountRequestTableProps = {
   onReject: (userId: string) => Promise<void>;
 };
 
+export const constructUrl = (
+  baseUrl: string,
+  params: { [key: string]: string | number | undefined }
+): string => {
+  const url = new URL(baseUrl, window.location.origin);
+  Object.keys(params).forEach((key) => {
+    if (params[key] !== undefined) {
+      url.searchParams.set(key, String(params[key]));
+    }
+  });
+  return url.toString();
+};
+
 const AccountRequestTable = ({
   users,
   currentPage,
@@ -51,6 +66,30 @@ const AccountRequestTable = ({
   onApprove,
   onReject,
 }: AccountRequestTableProps) => {
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page");
+  const sortBy = searchParams.get("sortBy");
+  const sortDirection = searchParams.get("sortDirection");
+
+  const [isLoading, setIsLoading] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("page")) {
+      params.set("page", "1");
+    }
+    if (!params.has("sortBy")) {
+      params.set("sortBy", "fullName");
+    }
+    if (!params.has("sortDirection")) {
+      params.set("sortDirection", "asc");
+    }
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, "", newUrl);
+  }, []);
+
   const renderEmptyState = () => {
     if (users.length > 0) return null;
 
@@ -63,6 +102,10 @@ const AccountRequestTable = ({
 
   const handleAction = async (userId: string, action: "approve" | "reject") => {
     try {
+      setIsLoading({
+        ...isLoading,
+        [action + userId]: true,
+      });
       toast({
         title: `${action === "approve" ? "Approving" : "Rejecting"} request...`,
       });
@@ -78,6 +121,11 @@ const AccountRequestTable = ({
       console.error(error);
       toast({
         title: `Failed to ${action} request`,
+      });
+    } finally {
+      setIsLoading({
+        ...isLoading,
+        [action + userId]: false,
       });
     }
   };
@@ -153,6 +201,7 @@ const AccountRequestTable = ({
                         variant="outline"
                         className="bg-green-200 text-green-800 hover:bg-green-300"
                         onClick={() => handleApprove(user.id)}
+                        disabled={isLoading["approve" + user.id]}
                       >
                         Approve Request
                       </Button>
@@ -164,10 +213,14 @@ const AccountRequestTable = ({
                           <Tooltip delayDuration={10}>
                             <TooltipTrigger asChild>
                               <div className="size-fit rounded-full bg-red-600 p-1 hover:bg-red-800">
-                                <CrossIcon
-                                  className="rotate-45 text-white"
-                                  size={20}
-                                />
+                                {isLoading["reject" + user.id] ? (
+                                  <Spinner />
+                                ) : (
+                                  <CrossIcon
+                                    className="rotate-45 text-white"
+                                    size={20}
+                                  />
+                                )}
                               </div>
                             </TooltipTrigger>
                             <TooltipContent className="bg-white p-3">
@@ -188,7 +241,13 @@ const AccountRequestTable = ({
               <PaginationContent>
                 {currentPage > 1 && (
                   <PaginationItem>
-                    <PaginationPrevious href={`?page=${currentPage - 1}`} />
+                    <PaginationPrevious
+                      href={constructUrl("/admin/account-requests", {
+                        page: parseInt(page || "1") - 1,
+                        sortBy: sortBy || "fullName",
+                        sortDirection: sortDirection || "asc",
+                      })}
+                    />
                   </PaginationItem>
                 )}
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -196,19 +255,29 @@ const AccountRequestTable = ({
                     Math.max(0, currentPage - 3), // Adjust start to ensure currentPage is centered
                     Math.min(totalPages, currentPage + 2) // Adjust end
                   )
-                  .map((page) => (
-                    <PaginationItem key={page}>
+                  .map((pageOption) => (
+                    <PaginationItem key={"pageOption" + pageOption}>
                       <PaginationLink
-                        href={`?page=${page}`}
-                        isActive={page === currentPage}
+                        href={constructUrl("/admin/account-requests", {
+                          page: pageOption,
+                          sortBy: sortBy || "fullName",
+                          sortDirection: sortDirection || "asc",
+                        })}
+                        isActive={pageOption === currentPage}
                       >
-                        {page}
+                        {pageOption}
                       </PaginationLink>
                     </PaginationItem>
                   ))}
                 {currentPage < totalPages && (
                   <PaginationItem>
-                    <PaginationNext href={`?page=${currentPage + 1}`} />
+                    <PaginationNext
+                      href={constructUrl("/admin/account-requests", {
+                        page: parseInt(page || "1") + 1,
+                        sortBy: sortBy || "fullName",
+                        sortDirection: sortDirection || "asc",
+                      })}
+                    />
                   </PaginationItem>
                 )}
               </PaginationContent>

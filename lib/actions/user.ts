@@ -1,7 +1,12 @@
 import { db } from "@/db/drizzle";
 import { RoleEnum, StatusEnum, users } from "@/db/schema";
 import { User } from "@/types";
-import { count, eq } from "drizzle-orm";
+import { asc, count, desc, eq } from "drizzle-orm";
+
+export enum SortByEnum {
+  CREATED_AT = "createdAt",
+  FULL_NAME = "fullName",
+}
 
 type GetUsersParams = {
   limit: number;
@@ -10,6 +15,8 @@ type GetUsersParams = {
 
 type GetUserByStatusParams = GetUsersParams & {
   status: StatusEnum;
+  sortBy?: SortByEnum;
+  sortDirection?: "asc" | "desc";
 };
 
 type DeleteUserParams = {
@@ -65,6 +72,8 @@ export const getUserByStatus = async ({
   limit,
   page,
   status,
+  sortBy = SortByEnum.CREATED_AT,
+  sortDirection = "asc",
 }: GetUserByStatusParams) => {
   const totalUserCount = await db
     .select({ count: count() })
@@ -78,6 +87,7 @@ export const getUserByStatus = async ({
     .select()
     .from(users)
     .where(eq(users.status, status))
+    .orderBy(sortDirection === "asc" ? asc(users[sortBy]) : desc(users[sortBy]))
     .limit(limit)
     .offset((page - 1) * limit);
 
