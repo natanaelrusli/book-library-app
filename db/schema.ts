@@ -35,11 +35,11 @@ export const BORROW_STATUS_ENUM = pgEnum("borrow_status", [
   "LATE",
 ]);
 
-export const BorrowStatusEnum = Object(
-  Object.fromEntries(
-    BORROW_STATUS_ENUM.enumValues.map((status) => [status, status]),
-  ) as { [K in (typeof BORROW_STATUS_ENUM.enumValues)[number]]: K },
-);
+export enum BorrowStatusEnum {
+  BORROWED = "BORROWED",
+  RETURNED = "RETURNED",
+  LATE = "LATE",
+}
 
 export const users = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom().unique(),

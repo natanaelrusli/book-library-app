@@ -9,7 +9,7 @@ interface AuthCredentials {
   universityCard: string;
 }
 
-type BorrowStatus = "BORROWED" | "RETURNED" | "OVERDUE";
+type BorrowStatus = "BORROWED" | "RETURNED" | "LATE";
 
 type Book = {
   id: string | number;

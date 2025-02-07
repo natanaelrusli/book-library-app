@@ -1,30 +1,44 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
+  Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationPrevious,
   PaginationLink,
   PaginationNext,
-  Pagination,
+  PaginationPrevious,
 } from "../ui/pagination";
 import {
-  TableHeader,
-  TableRow,
-  TableHead,
+  Table,
   TableBody,
   TableCell,
-  Table,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "../ui/table";
 import { Button } from "../ui/button";
 import { useSearchParams } from "next/navigation";
 import { ReceiptIcon, SortAsc } from "lucide-react";
-import { constructUrl, formatDate } from "@/lib/utils";
+import { cn, constructUrl, formatDate } from "@/lib/utils";
 import { Badge } from "../ui/badge";
 import { Label } from "../ui/label";
-import { BorrowHistory } from "@/types";
+import { BorrowHistory, BorrowStatus } from "@/types";
 import { Empty } from "antd";
+import BookCover from "@/components/BookCover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { BorrowStatusEnum } from "@/db/schema";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type BorrowRequestTableProps = {
   currentPage: number;
@@ -36,36 +50,105 @@ type TableRowProps = {
   request: BorrowHistory;
 };
 
-const BorrowRequestRow = ({ request }: TableRowProps) => (
-  <TableRow key={request.id}>
-    <TableCell className="w-[250px] p-4 font-bold">
-      {request.book.title}
-    </TableCell>
-    <TableCell>{request.user.fullName}</TableCell>
-    <TableCell>
-      <Badge>{request.borrowStatus}</Badge>
-    </TableCell>
-    <TableCell>
-      {request.borrowDate && formatDate(request.borrowDate)}
-    </TableCell>
-    <TableCell>
-      {(request.returnDate && formatDate(request.returnDate)) || "-"}
-    </TableCell>
-    <TableCell>{request.dueDate && formatDate(request.dueDate)}</TableCell>
-    <TableCell className="cursor-pointer gap-3">
-      <button
-        aria-label="Generate Receipt"
-        className="flex items-center gap-2 hover:text-primary-admin"
-      >
-        <ReceiptIcon />
-        <Label className="cursor-pointer">Generate</Label>
-      </button>
-    </TableCell>
-    <TableCell>
-      <Button variant="outline">Update Status</Button>
-    </TableCell>
-  </TableRow>
-);
+const statusBadgeVariant = (status: BorrowStatus) => {
+  switch (status) {
+    case "RETURNED":
+      return "secondary";
+    case "LATE":
+      return "destructive";
+    case "BORROWED":
+      return "outline";
+    default:
+      return "outline";
+  }
+};
+
+const BorrowRequestRow = ({ request }: TableRowProps) => {
+  const [borrowStatus, setBorrowStatus] = useState<BorrowStatus>(
+    request.borrowStatus,
+  );
+
+  return (
+    <TableRow key={request.id}>
+      <TableCell className="flex w-[250px] items-center gap-5 p-4 font-bold">
+        <BookCover
+          className="h-[80px] w-[50px] object-contain"
+          coverColor={request.book.color}
+          coverImage={request.book.cover}
+        />
+        {request.book.title}
+      </TableCell>
+      <TableCell>{request.user.fullName}</TableCell>
+      <TableCell>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Badge
+              className={
+                cn(
+                  borrowStatus === "LATE" &&
+                    "bg-red text-white hover:bg-red-600",
+                  borrowStatus === "RETURNED" &&
+                    "bg-green-600 text-white hover:bg-green",
+                ) + " cursor-pointer"
+              }
+              variant={statusBadgeVariant(borrowStatus)}
+            >
+              {borrowStatus}
+            </Badge>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-fit">
+            {Object.values(BorrowStatusEnum).map((item) => (
+              <DropdownMenuItem
+                key={item as string}
+                className="cursor-pointer"
+                onClick={() => setBorrowStatus(item)}
+              >
+                {item as string}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+      <TableCell>
+        {request.borrowDate && formatDate(request.borrowDate)}
+      </TableCell>
+      <TableCell>
+        {(request.returnDate && formatDate(request.returnDate)) || "-"}
+      </TableCell>
+      <TableCell>{request.dueDate && formatDate(request.dueDate)}</TableCell>
+      <TableCell className="cursor-pointer gap-3">
+        <Button
+          variant="outline"
+          aria-label="Generate Receipt"
+          className="flex items-center gap-2 hover:text-primary-admin"
+        >
+          <ReceiptIcon />
+          <Label className="cursor-pointer">Generate</Label>
+        </Button>
+      </TableCell>
+      <TableCell>
+        <TooltipProvider>
+          <Tooltip delayDuration={10}>
+            <TooltipTrigger>
+              <Button
+                variant="outline"
+                type="submit"
+                disabled={borrowStatus === request.borrowStatus}
+              >
+                Update Status
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-white text-sm font-bold text-primary-admin shadow-md">
+              {borrowStatus === request.borrowStatus
+                ? "Change the borrow status before updating"
+                : `Original status: ${request.borrowStatus}`}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </TableCell>
+    </TableRow>
+  );
+};
 
 const BorrowRequestTable = ({
   currentPage,
