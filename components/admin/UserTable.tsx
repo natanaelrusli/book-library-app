@@ -9,6 +9,7 @@ import { Check, FolderOpenIcon, SortAsc, Trash2Icon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn, formatDate } from "@/lib/utils";
 import { User } from "@/types";
+import { RoleEnum } from "@/db/schema";
 import DeleteConfirmModal from "@/components/admin/DeleteConfirmModal";
 import {
   Pagination,
@@ -33,14 +34,19 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { RoleEnum } from "@/db/schema";
 
 type UserTableProps = {
   users: User[];
   currentPage: number;
   totalPages: number;
   onDelete: (id: string) => Promise<void>;
-  onRoleUpdate: ({ userId, role }: {userId: string, role: RoleEnum}) => Promise<void>;
+  onRoleUpdate: ({
+    userId,
+    role,
+  }: {
+    userId: string;
+    role: RoleEnum;
+  }) => Promise<void>;
 };
 
 const UserTable = ({
@@ -48,7 +54,7 @@ const UserTable = ({
   currentPage,
   totalPages,
   onDelete,
-  onRoleUpdate
+  onRoleUpdate,
 }: UserTableProps) => {
   const { data: session } = useSession();
 
@@ -90,7 +96,7 @@ const UserTable = ({
       toast({
         title: "Updating user role...",
       });
-      
+
       await onRoleUpdate({
         userId,
         role: roleEnum as RoleEnum,
@@ -110,7 +116,7 @@ const UserTable = ({
         ["role" + userId]: false,
       });
     }
-  }
+  };
 
   const getRoleBadgeColor = (role: RoleEnum) => {
     const defaultStyling = "cursor-pointer rounded-lg";
@@ -129,10 +135,10 @@ const UserTable = ({
     if (users.length > 0) return null;
 
     return (
-      <div className='mb-4 mt-6 flex w-full flex-col items-center justify-center'>
+      <div className="mb-4 mt-6 flex w-full flex-col items-center justify-center">
         <Empty />
         <Link href={`/admin/account-requests`}>
-          <Button variant='outline' className='mt-4'>
+          <Button variant="outline" className="mt-4">
             Go to Account Request
           </Button>
         </Link>
@@ -140,19 +146,22 @@ const UserTable = ({
     );
   };
 
-  const UserStatusDropdown = ({userId, role }: { userId: string, role: RoleEnum }) => {
+  const UserStatusDropdown = ({
+    userId,
+    role,
+  }: {
+    userId: string;
+    role: RoleEnum;
+  }) => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Badge
-            variant="outline"
-            className={getRoleBadgeColor(role as RoleEnum)}
-          >
+          <Badge variant="outline" className={getRoleBadgeColor(role)}>
             {role}
           </Badge>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="flex w-fit flex-col gap-1 p-3">
-          {Object.values(RoleEnum).map((roleEnum) => (
+          {Object.values(RoleEnum).map((roleEnum: RoleEnum) => (
             <button
               key={roleEnum}
               disabled={role === roleEnum}
@@ -171,10 +180,10 @@ const UserTable = ({
 
   return (
     <div>
-      <div className='flex w-full items-center justify-between'>
-        <h1 className='text-2xl font-bold'>All Users</h1>
+      <div className="flex w-full items-center justify-between">
+        <h1 className="text-2xl font-bold">All Users</h1>
 
-        <Button variant='outline'>
+        <Button variant="outline">
           A - Z <SortAsc />
         </Button>
       </div>
@@ -182,9 +191,9 @@ const UserTable = ({
       {renderEmptyState()}
 
       {users.length > 0 && (
-        <div className='mt-6'>
+        <div className="mt-6">
           <Table>
-            <TableHeader className='rounded-lg bg-secondary'>
+            <TableHeader className="rounded-lg bg-secondary">
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
@@ -200,36 +209,39 @@ const UserTable = ({
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className='w-[300px] font-bold'>
+                  <TableCell className="w-[300px] font-bold">
                     {user.fullName}
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
                     {user.createdAt && formatDate(user.createdAt)}
                   </TableCell>
-                    <TableCell>
-                      <UserStatusDropdown userId={user.id} role={user.role as RoleEnum} />
-                    </TableCell>
+                  <TableCell>
+                    <UserStatusDropdown
+                      userId={user.id}
+                      role={user.role as RoleEnum}
+                    />
+                  </TableCell>
                   <TableCell>{user.booksBorrowed || 0}</TableCell>
                   <TableCell>{user.universityId}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          role='button'
-                          variant='link'
-                          className='text-primary-admin'
+                          role="button"
+                          variant="link"
+                          className="text-primary-admin"
                         >
                           <span>Show ID Card</span> <FolderOpenIcon />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className='flex w-fit flex-col gap-2 p-2'>
+                      <DropdownMenuContent className="flex w-fit flex-col gap-2 p-2">
                         <Image
                           src={user.universityCard}
-                          alt='ID card'
+                          alt="ID card"
                           width={150}
                           height={100}
-                          className='w-[300px]'
+                          className="w-[300px]"
                         />
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -237,11 +249,11 @@ const UserTable = ({
                   <TableCell>
                     {session?.user?.id === user.id ? null : (
                       <Button
-                        variant='link'
+                        variant="link"
                         onClick={() => handleDeleteClick(user.id)}
                         disabled={isDeleting}
                       >
-                        <Trash2Icon className='text-red-500' size={20} />
+                        <Trash2Icon className="text-red-500" size={20} />
                       </Button>
                     )}
                   </TableCell>
@@ -252,7 +264,7 @@ const UserTable = ({
         </div>
       )}
 
-      <div className='mt-2'>
+      <div className="mt-2">
         <Pagination>
           <PaginationContent>
             {currentPage > 1 && (
@@ -263,7 +275,7 @@ const UserTable = ({
             {Array.from({ length: totalPages }, (_, i) => i + 1)
               .slice(
                 Math.max(0, currentPage - 3), // Adjust start to ensure currentPage is centered
-                Math.min(totalPages, currentPage + 2) // Adjust end
+                Math.min(totalPages, currentPage + 2), // Adjust end
               )
               .map((page) => (
                 <PaginationItem key={page}>

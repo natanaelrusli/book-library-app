@@ -75,16 +75,16 @@ const BookTable = ({
   return (
     <div>
       {!books.length ? (
-        <div className='flex h-[500px] w-full flex-col items-center justify-center gap-2'>
-          <p className='text-lg font-semibold text-slate-600'>
+        <div className="flex h-[500px] w-full flex-col items-center justify-center gap-2">
+          <p className="text-lg font-semibold text-slate-600">
             No books found.
           </p>
-          <p className='text-sm'>Add a book by creatin a new book</p>
+          <p className="text-sm">Add a book by creatin a new book</p>
         </div>
       ) : (
         <>
           <Table>
-            <TableHeader className='rounded-lg bg-secondary'>
+            <TableHeader className="rounded-lg bg-secondary">
               <TableRow>
                 <TableHead>Book Title</TableHead>
                 <TableHead>Author</TableHead>
@@ -98,14 +98,14 @@ const BookTable = ({
             <TableBody>
               {books.map((book) => (
                 <TableRow key={book.id}>
-                  <TableCell className='font-bold'>
-                    <div className='flex items-center gap-3'>
+                  <TableCell className="font-bold">
+                    <div className="flex items-center gap-3">
                       <Image
                         src={book.cover}
-                        alt='cover image'
+                        alt="cover image"
                         width={100}
                         height={200}
-                        className='w-[40px]'
+                        className="w-[40px]"
                       />
                       {book.title}
                     </div>
@@ -122,27 +122,27 @@ const BookTable = ({
                     {!selectedImage && (
                       <Popover>
                         <PopoverTrigger>
-                          <div className='cursor-pointer rounded-lg p-2 transition-all hover:bg-slate-400 hover:text-primary-admin'>
+                          <div className="cursor-pointer rounded-lg p-2 transition-all hover:bg-slate-400 hover:text-primary-admin">
                             <ImageIcon />
                           </div>
                         </PopoverTrigger>
                         <PopoverContent>
-                          <div className='flex flex-col items-center gap-2'>
+                          <div className="flex flex-col items-center gap-2">
                             <Image
                               src={book.cover}
                               alt={book.title}
                               width={200}
                               height={150}
-                              className='size-full max-h-80 object-contain'
+                              className="size-full max-h-80 object-contain"
                             />
                             <Button
                               onClick={() =>
                                 downloadImage(
                                   book.cover,
-                                  `${book.title}-${formatDate(new Date())}`
+                                  `${book.title}-${formatDate(new Date())}`,
                                 )
                               }
-                              className='w-full bg-primary-admin text-white hover:bg-slate-800'
+                              className="w-full bg-primary-admin text-white hover:bg-slate-800"
                             >
                               <DownloadIcon />
                               Download Image
@@ -150,7 +150,7 @@ const BookTable = ({
 
                             <Button
                               onClick={() => setSelectedImage(book.cover)}
-                              className='w-full bg-primary-admin text-white hover:bg-slate-800'
+                              className="w-full bg-primary-admin text-white hover:bg-slate-800"
                             >
                               <ZoomIn />
                               Enlarge Image
@@ -160,29 +160,29 @@ const BookTable = ({
                       </Popover>
                     )}
                   </TableCell>
-                  <TableCell className='flex gap-2'>
+                  <TableCell className="flex gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         {/* i want to center the button below without using padding */}
-                        <div className='mt-3 flex justify-center'>
-                          <Button variant='outline'>...</Button>
+                        <div className="mt-3 flex justify-center">
+                          <Button variant="outline">...</Button>
                         </div>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className='w-56'>
+                      <DropdownMenuContent className="w-56">
                         <DropdownMenuGroup>
                           <DropdownMenuItem>
                             <Link
                               href={`/admin/books/${book.id}`}
-                              className='flex w-full cursor-pointer items-center justify-between'
+                              className="flex w-full cursor-pointer items-center justify-between"
                             >
                               View Detail
                               <DropdownMenuShortcut>⇧⌘O</DropdownMenuShortcut>
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => handleDelete(book.id)}
+                            onClick={() => handleDelete(book.id as string)}
                           >
-                            <div className='flex w-full cursor-pointer items-center text-red-600'>
+                            <div className="flex w-full cursor-pointer items-center text-red-600">
                               Delete Book
                               <DropdownMenuShortcut>⇧⌘D</DropdownMenuShortcut>
                             </div>
@@ -196,7 +196,7 @@ const BookTable = ({
             </TableBody>
           </Table>
 
-          <div className='mt-2'>
+          <div className="mt-2">
             <Pagination>
               <PaginationContent>
                 {currentPage > 1 && (
@@ -207,7 +207,7 @@ const BookTable = ({
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                   .slice(
                     Math.max(0, currentPage - 3), // Adjust start to ensure currentPage is centered
-                    Math.min(totalPages, currentPage + 2) // Adjust end
+                    Math.min(totalPages, currentPage + 2), // Adjust end
                   )
                   .map((page) => (
                     <PaginationItem key={page}>

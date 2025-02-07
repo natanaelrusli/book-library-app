@@ -6,10 +6,11 @@ import { ArrowLeft } from "lucide-react";
 import { BookInsert, getBookById, updateBook } from "@/lib/actions/book";
 import { z } from "zod";
 import { createBookSchema } from "@/lib/validation";
+import { Book } from "@/types";
 
 const EditBook = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;
-  const book = await getBookById(id);
+  const book: Book = await getBookById(id);
 
   const handleUpdateBook = async (book: z.infer<typeof createBookSchema>) => {
     "use server";

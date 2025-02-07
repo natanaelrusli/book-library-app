@@ -29,6 +29,18 @@ export enum RoleEnum {
   ADMIN = "ADMIN",
 }
 
+export const BORROW_STATUS_ENUM = pgEnum("borrow_status", [
+  "BORROWED",
+  "RETURNED",
+  "LATE",
+]);
+
+export const BorrowStatusEnum = Object(
+  Object.fromEntries(
+    BORROW_STATUS_ENUM.enumValues.map((status) => [status, status]),
+  ) as { [K in (typeof BORROW_STATUS_ENUM.enumValues)[number]]: K },
+);
+
 export const users = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
   fullName: varchar("full_name", {
@@ -55,8 +67,8 @@ export const books = pgTable("book", {
   author: varchar("author").notNull(),
   genre: varchar("genre").notNull(),
   rating: integer("rating").notNull().default(1),
-  totalCopies: integer("total_copies"),
-  availableCopies: integer("available_copies"),
+  totalCopies: integer("total_copies").notNull(),
+  availableCopies: integer("available_copies").notNull(),
   description: varchar("description", {
     length: 255,
   }).notNull(),
@@ -68,4 +80,29 @@ export const books = pgTable("book", {
   createdAt: timestamp("created_at", {
     withTimezone: true,
   }).defaultNow(),
+});
+
+export const borrowHistory = pgTable("borrow_history", {
+  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  bookId: uuid("book_id").references(() => books.id),
+  userId: uuid("user_id").references(() => users.id),
+  borrowStatus: BORROW_STATUS_ENUM("borrow_status").default("BORROWED"),
+  borrowDate: timestamp("borrow_date", {
+    withTimezone: true,
+  }).defaultNow(),
+  returnDate: timestamp("return_date", {
+    withTimezone: true,
+  }),
+  dueDate: timestamp("due_date", {
+    withTimezone: true,
+  }),
+  receipt: varchar("receipt"),
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+  }).defaultNow(),
+  updatedAt: timestamp("updated_at", {
+    withTimezone: true,
+  })
+    .notNull()
+    .defaultNow(),
 });

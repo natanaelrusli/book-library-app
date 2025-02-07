@@ -62,7 +62,7 @@ const CreateBookForm = <T extends FieldValues>({
       case "number":
         return <NumberInput field={field} />;
       case "color":
-        return <ColorPicker field={field} />;
+        return <ColorPicker value={field.value} onPickerChange={() => {}} />;
       case "textarea":
         return <Textarea rows={5} className="book-form_input" {...field} />;
       default:

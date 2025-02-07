@@ -21,6 +21,7 @@ import FileUpload from "@/components/admin/forms/FileUpload";
 import ColorPicker from "@/components/admin/ColorPicker";
 import Spinner from "@/components/ui/spinner";
 import { toast } from "@/hooks/use-toast";
+import { Book } from "@/types";
 
 interface Props extends Partial<Book> {
   type?: "create" | "update";

@@ -48,7 +48,7 @@ type AccountRequestTableProps = {
 
 export const constructUrl = (
   baseUrl: string,
-  params: { [key: string]: string | number | undefined }
+  params: { [key: string]: string | number | undefined },
 ): string => {
   const url = new URL(baseUrl, window.location.origin);
   Object.keys(params).forEach((key) => {
@@ -143,7 +143,7 @@ const AccountRequestTable = ({
         page: parseInt(page || "1"),
         sortBy: sortBy || "fullName",
         sortDirection: newSortDirection,
-      })
+      }),
     );
   };
 
@@ -273,21 +273,20 @@ const AccountRequestTable = ({
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                   .slice(
                     Math.max(0, currentPage - 3), // Adjust start to ensure currentPage is centered
-                    Math.min(totalPages, currentPage + 2) // Adjust end
+                    Math.min(totalPages, currentPage + 2), // Adjust end
                   )
                   .map((pageOption) => (
-                    <PaginationItem key={"pageOption" + pageOption}>
-                      <PaginationLink
-                        href={constructUrl("/admin/account-requests", {
-                          page: pageOption,
-                          sortBy: sortBy || "fullName",
-                          sortDirection: sortDirection || "asc",
-                        })}
-                        isActive={pageOption === currentPage}
-                      >
-                        {pageOption}
-                      </PaginationLink>
-                    </PaginationItem>
+                    <PaginationLink
+                      key={pageOption + "page"}
+                      href={constructUrl("/admin/account-requests", {
+                        page: pageOption,
+                        sortBy: sortBy || "fullName",
+                        sortDirection: sortDirection || "asc",
+                      })}
+                      isActive={pageOption === currentPage}
+                    >
+                      {pageOption}
+                    </PaginationLink>
                   ))}
                 {currentPage < totalPages && (
                   <PaginationItem>

@@ -38,9 +38,22 @@ export const downloadImage = (url: string, fileName?: string) => {
     });
 };
 
-export const formatDate = (date: Date) =>
+export const formatDate = (date: Date | string) =>
   new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
+
+export const constructUrl = (
+  baseUrl: string,
+  params: { [key: string]: string | number | undefined }
+): string => {
+  const url = new URL(baseUrl, window.location.origin);
+  Object.keys(params).forEach((key) => {
+    if (params[key] !== undefined) {
+      url.searchParams.set(key, String(params[key]));
+    }
+  });
+  return url.toString();
+};

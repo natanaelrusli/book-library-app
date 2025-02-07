@@ -61,13 +61,13 @@ export const getAllBooks = async ({ limit, page }: GetBooksParams) => {
     .offset((page - 1) * limit);
 
   return {
-    books: allBooks as Book[],
+    books: allBooks,
     totalPages, // Add the total pages count to the result
     currentPage: page,
   };
 };
 
-export const getBookById = async (id: string): Promise<BookSelect> => {
+export const getBookById = async (id: string): Promise<Book> => {
   const book = await db.select().from(books).where(eq(books.id, id));
 
   return book[0];
@@ -102,7 +102,7 @@ export const updateBook = async (book: BookInsert): Promise<BookSelect> => {
 };
 
 export const deleteBookById = async (
-  id: string
+  id: string,
 ): Promise<{ success: boolean }> => {
   try {
     await db.delete(books).where(eq(books.id, id));

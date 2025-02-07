@@ -2,17 +2,19 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import BookCover from "@/components/BookCover";
+import { Book } from "@/types";
 
 const BookOverview = ({
   title,
   author,
   genre,
   rating,
-  total_copies,
-  available_copies,
+  totalCopies,
+  availableCopies,
   description,
   color,
   cover,
+  createdAt,
 }: Book) => {
   return (
     <section className="book-overview">
@@ -37,11 +39,11 @@ const BookOverview = ({
 
         <div className="book-copies">
           <p>
-            Total Books: <span>{total_copies}</span>
+            Total Books: <span>{totalCopies}</span>
           </p>
 
           <p>
-            Available Books: <span>{available_copies}</span>
+            Available Books: <span>{availableCopies}</span>
           </p>
         </div>
 
