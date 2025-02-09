@@ -1,6 +1,6 @@
 import { db } from "@/db/drizzle";
 import { books, borrowHistory, users } from "@/db/schema";
-import { BorrowHistory } from "@/types";
+import { BorrowHistory, BorrowStatus } from "@/types";
 import { count, eq } from "drizzle-orm";
 
 interface GetBorrowHistoryarams {
@@ -53,4 +53,37 @@ export const getAllBorrowRequest = async ({
     totalPages,
     currentPage: page,
   };
+};
+
+export const updateBorrowStatus = async ({
+  borrowStatus,
+  borrowDataId,
+}: {
+  borrowStatus: BorrowStatus;
+  borrowDataId: string;
+}) => {
+  try {
+    switch (borrowStatus) {
+      case "RETURNED":
+        await db
+          .update(borrowHistory)
+          .set({
+            borrowStatus,
+            returnDate: new Date(),
+          })
+          .where(eq(borrowHistory.id, borrowDataId))
+          .returning();
+      default:
+        await db
+          .update(borrowHistory)
+          .set({
+            borrowStatus,
+          })
+          .where(eq(borrowHistory.id, borrowDataId))
+          .returning();
+    }
+  } catch (error) {
+    console.error("Failed to update borrow status:", error);
+    throw new Error("Failed to update borrow status.");
+  }
 };
