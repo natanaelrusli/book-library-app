@@ -47,6 +47,7 @@ export const users = pgTable("user", {
     length: 255,
   }).notNull(),
   email: text("email").notNull().unique(),
+  profilePicture: varchar("profile_picture"),
   universityId: integer("university_id").notNull().unique(),
   password: text("password").notNull(),
   universityCard: text("university_card").notNull(),

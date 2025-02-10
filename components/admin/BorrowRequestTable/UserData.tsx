@@ -39,7 +39,7 @@ const UserData = ({ user, labelMaxWidth = 150 }: UserDataProps) => {
       <div>
         <Image
           className="size-8 min-w-8 rounded-full"
-          src={user.universityCard}
+          src={user.profilePicture}
           alt={user.fullName}
           width={100}
           height={100}

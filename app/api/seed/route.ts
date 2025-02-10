@@ -1,4 +1,4 @@
-import { users, StatusEnum, RoleEnum } from "@/db/schema";
+import { RoleEnum, StatusEnum, users } from "@/db/schema";
 import { db } from "@/db/drizzle";
 import { hash } from "bcryptjs";
 import { NextResponse } from "next/server";
@@ -14,6 +14,7 @@ async function seedUsers() {
       status: StatusEnum.APPROVED,
       booksBorrowed: 2,
       role: RoleEnum.USER,
+      profilePicture: `https://dummyimage.com/600x400/000/fff&text=UC${i}`,
     };
 
     const hashedPassword = await hash(values.password, 10);
@@ -25,11 +26,12 @@ async function seedUsers() {
       universityCard: values.universityCard,
       password: hashedPassword,
       role: values.role,
+      profilePicture: values.profilePicture,
     });
   }
 }
 
-export async function POST() {
+export async function GET() {
   try {
     await seedUsers();
     return NextResponse.json({ message: "Users seeded successfully" });

@@ -12,7 +12,7 @@ interface AuthCredentials {
 type BorrowStatus = "BORROWED" | "RETURNED" | "LATE";
 
 type Book = {
-  id: string | number;
+  id?: string | number;
   title: string;
   author: string;
   genre: string;
@@ -25,12 +25,13 @@ type Book = {
   video: string | null;
   summary: string;
   isLoanedBook: boolean;
-  createdAt: Date | null;
+  createdAt?: Date | null;
 };
 
 type User = {
   id: string;
   fullName: string;
+  profilePicture: string;
   email: string;
   universityId: number;
   universityCard: string;

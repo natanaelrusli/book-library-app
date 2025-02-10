@@ -39,6 +39,7 @@ import { downloadImage, formatDate } from "@/lib/utils";
 import EnlargedImage from "../EnlargedImage";
 import { toast } from "@/hooks/use-toast";
 import { Book } from "@/types";
+import BookCover from "@/components/BookCover";
 
 interface BookTableProps {
   books: Book[];
@@ -79,7 +80,7 @@ const BookTable = ({
           <p className="text-lg font-semibold text-slate-600">
             No books found.
           </p>
-          <p className="text-sm">Add a book by creatin a new book</p>
+          <p className="text-sm">Add a book by creating a new book</p>
         </div>
       ) : (
         <>
@@ -98,14 +99,12 @@ const BookTable = ({
             <TableBody>
               {books.map((book) => (
                 <TableRow key={book.id}>
-                  <TableCell className="font-bold">
+                  <TableCell className="p-5 font-bold">
                     <div className="flex items-center gap-3">
-                      <Image
-                        src={book.cover}
-                        alt="cover image"
-                        width={100}
-                        height={200}
-                        className="w-[40px]"
+                      <BookCover
+                        coverColor={book.color}
+                        coverImage={book.cover}
+                        className="h-[100px] w-[80px]"
                       />
                       {book.title}
                     </div>
@@ -164,7 +163,7 @@ const BookTable = ({
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         {/* i want to center the button below without using padding */}
-                        <div className="mt-3 flex justify-center">
+                        <div className="mt-10 flex justify-center">
                           <Button variant="outline">...</Button>
                         </div>
                       </DropdownMenuTrigger>

@@ -1,10 +1,8 @@
 "use client";
 
 // TODO:
-// handle the flow of book borrowing
-// borrowed then can be changed to returned or late
-// once it is returned cannot be changed to borrowing
-// if it is borrowed and today pass the due date, update the status to late
+// if it is borrowed and today pass the due date, update the status to late - This should be done in BE using CRON job ideally
+// Learn how to generate receipt
 
 import React, { useState } from "react";
 import {
@@ -108,11 +106,38 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
     }
   };
 
+  const borrowStatusBadgeDisabled = () => {
+    if (request.borrowStatus === "RETURNED") {
+      return true;
+    }
+
+    return false;
+  };
+
+  const borrowStatusOptionEnabled = ({
+    option,
+    currentBorrowStatus,
+  }: {
+    option: BorrowStatus;
+    currentBorrowStatus: BorrowStatus;
+  }): boolean => {
+    if (currentBorrowStatus === "RETURNED") {
+      return false; // All options disabled
+    }
+    if (currentBorrowStatus === "LATE") {
+      return option === "RETURNED"; // Only 'RETURNED' enabled
+    }
+    if (currentBorrowStatus === "BORROWED") {
+      return option !== "BORROWED"; // 'BORROWED' disabled, others enabled
+    }
+    return true; // Default: All options enabled
+  };
+
   return (
     <TableRow key={request.id}>
       <TableCell className="flex w-[250px] items-center gap-5 p-4 font-bold">
         <BookCover
-          className="h-[80px] w-[50px] object-contain"
+          className="h-[80px] w-[60px] object-contain"
           coverColor={request.book.color}
           coverImage={request.book.cover}
         />
@@ -121,24 +146,41 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
       <TableCell>{<UserData user={request.user} />}</TableCell>
       <TableCell>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild disabled={borrowStatusBadgeDisabled()}>
             <Badge
-              className={
-                cn(
-                  borrowStatus === "LATE" &&
-                    "bg-red text-white hover:bg-red-600",
-                  borrowStatus === "RETURNED" &&
-                    "bg-green-600 text-white hover:bg-green",
-                ) + " cursor-pointer"
-              }
+              className={cn(
+                borrowStatus === "LATE" && "bg-red text-white hover:bg-red-600",
+                borrowStatus === "RETURNED" &&
+                  "bg-green-600 text-white hover:bg-green",
+                !borrowStatusBadgeDisabled() && "cursor-pointer",
+              )}
               variant={statusBadgeVariant(borrowStatus)}
             >
               {borrowStatus}
             </Badge>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-fit">
+            <DropdownMenuItem asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mx-auto my-1 w-full cursor-pointer"
+                disabled={borrowStatus === request.borrowStatus}
+                onClick={() =>
+                  setBorrowStatus(request.borrowStatus as BorrowStatusEnum)
+                }
+              >
+                Reset
+              </Button>
+            </DropdownMenuItem>
             {Object.values(BorrowStatusEnum).map((item) => (
               <DropdownMenuItem
+                disabled={
+                  !borrowStatusOptionEnabled({
+                    option: item,
+                    currentBorrowStatus: request.borrowStatus,
+                  })
+                }
                 key={item as string}
                 className="cursor-pointer"
                 onClick={() => setBorrowStatus(item)}
