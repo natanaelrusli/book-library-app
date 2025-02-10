@@ -2,7 +2,7 @@
 
 // TODO:
 // if it is borrowed and today pass the due date, update the status to late - This should be done in BE using CRON job ideally
-// Learn how to generate receipt
+// How to make sure admin dont send email to user more than once per hour?
 
 import React, { useState } from "react";
 import {
@@ -49,6 +49,8 @@ import {
 } from "@/context/BorrowRequestContext";
 import { toast } from "@/hooks/use-toast";
 import UserData from "@/components/admin/BorrowRequestTable/UserData";
+import ReceiptPDF from "@/emails/receipt";
+import ReceiptViewer from "./ReceiptViewer";
 
 type BorrowRequestTableProps = {
   currentPage: number;
@@ -82,9 +84,10 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
     request.borrowStatus
   );
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
-  const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
+  const [isReceiptModalShown, setIsReceiptModalShown] =
+    useState<boolean>(false);
 
-  const { onUpdateStatus } = useBorrowRequestContext();
+  const { onUpdateStatus, generateReceipt } = useBorrowRequestContext();
 
   const handleBorrowStatusUpdate = async () => {
     try {
@@ -134,42 +137,8 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
     return true; // Default: All options enabled
   };
 
-  const handleSendReceiptEmail = async () => {
-    try {
-      setIsSendingEmail(true);
-      toast({
-        title: "Sending email...",
-      });
-      const res = await fetch("/api/send-email/receipt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: request.user.email,
-          bookTitle: request.book.title,
-          fullName: request.user.fullName,
-          borrowDate: request.borrowDate,
-          dueDate: request.dueDate,
-        }),
-      });
-
-      const data = await res.json(); // Parse response body as JSON
-
-      if (data.error) {
-        toast({
-          title: "Error sending email",
-          variant: "destructive",
-        });
-        throw new Error(data.message || "Failed to send email");
-      }
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Error sending email",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSendingEmail(false);
-    }
+  const handleShowReceipt = () => {
+    setIsReceiptModalShown(true);
   };
 
   return (
@@ -242,8 +211,7 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
           variant='outline'
           aria-label='Generate Receipt'
           className='flex items-center gap-2 hover:text-primary-admin'
-          onClick={handleSendReceiptEmail}
-          disabled={isSendingEmail}
+          onClick={handleShowReceipt}
         >
           <ReceiptIcon />
           <Label className='cursor-pointer'>Generate</Label>
@@ -271,6 +239,11 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
           </Tooltip>
         </TooltipProvider>
       </TableCell>
+      <ReceiptViewer
+        onClose={() => setIsReceiptModalShown(false)}
+        show={isReceiptModalShown}
+        receipt={generateReceipt(request)}
+      />
     </TableRow>
   );
 };
@@ -296,8 +269,20 @@ const BorrowRequestTable = ({
     });
   };
 
+  const generateReceipt = (borrowRequest: BorrowHistory) => {
+    return (
+      <ReceiptPDF
+        bookTitle={borrowRequest.book.title}
+        fullName={borrowRequest.user.fullName}
+        borrowDate={formatDate(borrowRequest.borrowDate)}
+        dueDate={formatDate(borrowRequest.dueDate || new Date())}
+        coverImage={borrowRequest.book.cover}
+      />
+    );
+  };
+
   return (
-    <BorrowRequestContext.Provider value={{ onUpdateStatus }}>
+    <BorrowRequestContext.Provider value={{ onUpdateStatus, generateReceipt }}>
       <div>
         <div className='flex w-full items-center justify-between'>
           <h1 className='text-2xl font-bold'>Borrow Book Requests</h1>

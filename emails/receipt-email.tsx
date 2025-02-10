@@ -32,7 +32,7 @@ const ReceiptEmail = ({
   return (
     <Html>
       <Head />
-      <Preview>{`BookBook Receipt - ${bookTitle}`}</Preview>
+      <Preview>{`BookBook Receipt Generated`}</Preview>
       <Tailwind>
         <Body className='m-auto bg-primary-admin px-2 font-sans text-white'>
           <Container className='mx-auto my-[40px] max-w-[465px] rounded border border-solid bg-blue-950 p-[20px] text-white shadow-lg'>
@@ -92,7 +92,7 @@ const ReceiptEmail = ({
             <Text className='text-[12px] leading-[24px] text-light-600'>
               Keep the pages turning
               <br />
-              The BookWise Team
+              The BookBook Team
             </Text>
           </Container>
         </Body>
