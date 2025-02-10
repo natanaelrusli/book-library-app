@@ -56,7 +56,7 @@ type BorrowRequestTableProps = {
   borrowRequests: BorrowHistory[];
   onUpdateStatus: (
     borrowStatus: BorrowStatusEnum,
-    borrowDataId: string,
+    borrowDataId: string
   ) => Promise<void>;
 };
 
@@ -79,9 +79,10 @@ const statusBadgeVariant = (status: BorrowStatus) => {
 
 const BorrowRequestRow = ({ request }: TableRowProps) => {
   const [borrowStatus, setBorrowStatus] = useState<BorrowStatus>(
-    request.borrowStatus,
+    request.borrowStatus
   );
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
 
   const { onUpdateStatus } = useBorrowRequestContext();
 
@@ -133,11 +134,49 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
     return true; // Default: All options enabled
   };
 
+  const handleSendReceiptEmail = async () => {
+    try {
+      setIsSendingEmail(true);
+      toast({
+        title: "Sending email...",
+      });
+      const res = await fetch("/api/send-email/receipt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: request.user.email,
+          bookTitle: request.book.title,
+          fullName: request.user.fullName,
+          borrowDate: request.borrowDate,
+          dueDate: request.dueDate,
+        }),
+      });
+
+      const data = await res.json(); // Parse response body as JSON
+
+      if (data.error) {
+        toast({
+          title: "Error sending email",
+          variant: "destructive",
+        });
+        throw new Error(data.message || "Failed to send email");
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error sending email",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
   return (
     <TableRow key={request.id}>
-      <TableCell className="flex w-[250px] items-center gap-5 p-4 font-bold">
+      <TableCell className='flex w-[250px] items-center gap-5 p-4 font-bold'>
         <BookCover
-          className="h-[80px] w-[60px] object-contain"
+          className='h-[80px] w-[60px] object-contain'
           coverColor={request.book.color}
           coverImage={request.book.cover}
         />
@@ -152,19 +191,19 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
                 borrowStatus === "LATE" && "bg-red text-white hover:bg-red-600",
                 borrowStatus === "RETURNED" &&
                   "bg-green-600 text-white hover:bg-green",
-                !borrowStatusBadgeDisabled() && "cursor-pointer",
+                !borrowStatusBadgeDisabled() && "cursor-pointer"
               )}
               variant={statusBadgeVariant(borrowStatus)}
             >
               {borrowStatus}
             </Badge>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-fit">
+          <DropdownMenuContent className='w-fit'>
             <DropdownMenuItem asChild>
               <Button
-                variant="outline"
-                size="sm"
-                className="mx-auto my-1 w-full cursor-pointer"
+                variant='outline'
+                size='sm'
+                className='mx-auto my-1 w-full cursor-pointer'
                 disabled={borrowStatus === request.borrowStatus}
                 onClick={() =>
                   setBorrowStatus(request.borrowStatus as BorrowStatusEnum)
@@ -182,7 +221,7 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
                   })
                 }
                 key={item as string}
-                className="cursor-pointer"
+                className='cursor-pointer'
                 onClick={() => setBorrowStatus(item)}
               >
                 {item as string}
@@ -198,14 +237,16 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
         {(request.returnDate && formatDate(request.returnDate)) || "-"}
       </TableCell>
       <TableCell>{request.dueDate && formatDate(request.dueDate)}</TableCell>
-      <TableCell className="cursor-pointer gap-3">
+      <TableCell className='cursor-pointer gap-3'>
         <Button
-          variant="outline"
-          aria-label="Generate Receipt"
-          className="flex items-center gap-2 hover:text-primary-admin"
+          variant='outline'
+          aria-label='Generate Receipt'
+          className='flex items-center gap-2 hover:text-primary-admin'
+          onClick={handleSendReceiptEmail}
+          disabled={isSendingEmail}
         >
           <ReceiptIcon />
-          <Label className="cursor-pointer">Generate</Label>
+          <Label className='cursor-pointer'>Generate</Label>
         </Button>
       </TableCell>
       <TableCell>
@@ -214,7 +255,7 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
             <TooltipTrigger asChild>
               <div>
                 <Button
-                  variant="outline"
+                  variant='outline'
                   disabled={borrowStatus === request.borrowStatus || isUpdating}
                   onClick={handleBorrowStatusUpdate}
                 >
@@ -222,7 +263,7 @@ const BorrowRequestRow = ({ request }: TableRowProps) => {
                 </Button>
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-white text-sm font-bold text-primary-admin shadow-md">
+            <TooltipContent className='bg-white text-sm font-bold text-primary-admin shadow-md'>
               {borrowStatus === request.borrowStatus
                 ? "Change the borrow status before updating"
                 : `Original status: ${request.borrowStatus}`}
@@ -258,17 +299,17 @@ const BorrowRequestTable = ({
   return (
     <BorrowRequestContext.Provider value={{ onUpdateStatus }}>
       <div>
-        <div className="flex w-full items-center justify-between">
-          <h1 className="text-2xl font-bold">Borrow Book Requests</h1>
-          <Button variant="outline" onClick={toggleSort}>
+        <div className='flex w-full items-center justify-between'>
+          <h1 className='text-2xl font-bold'>Borrow Book Requests</h1>
+          <Button variant='outline' onClick={toggleSort}>
             {sortDirection === "asc" ? "Older to Recent" : "Recent to Older"}{" "}
             <SortAsc />
           </Button>
         </div>
 
-        <div className="mt-6">
+        <div className='mt-6'>
           <Table>
-            <TableHeader className="rounded-lg bg-secondary">
+            <TableHeader className='rounded-lg bg-secondary'>
               <TableRow>
                 <TableHead>Book</TableHead>
                 <TableHead>User Requested</TableHead>
@@ -290,7 +331,7 @@ const BorrowRequestTable = ({
                 <TableRow>
                   <TableCell
                     colSpan={7}
-                    className="py-4 text-center text-gray-500"
+                    className='py-4 text-center text-gray-500'
                   >
                     <Empty />
                   </TableCell>
@@ -301,7 +342,7 @@ const BorrowRequestTable = ({
         </div>
 
         {totalPages > 1 && (
-          <div className="mt-2">
+          <div className='mt-2'>
             <Pagination>
               <PaginationContent>
                 {currentPage > 1 && (
@@ -318,7 +359,7 @@ const BorrowRequestTable = ({
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                   .slice(
                     Math.max(0, currentPage - 3),
-                    Math.min(totalPages, currentPage + 2),
+                    Math.min(totalPages, currentPage + 2)
                   )
                   .map((pageOption) => (
                     <PaginationLink

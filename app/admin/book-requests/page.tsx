@@ -21,7 +21,7 @@ const Page = async () => {
 
   const handleBorrowStatusUpdate = async (
     borrowStatus: BorrowStatusEnum,
-    borrowDataId: string,
+    borrowDataId: string
   ) => {
     "use server";
 
@@ -33,7 +33,7 @@ const Page = async () => {
   };
 
   return (
-    <Card className="p-6">
+    <Card className='p-6'>
       <BorrowRequestTable
         borrowRequests={data.borrowHistory}
         currentPage={data.currentPage}
