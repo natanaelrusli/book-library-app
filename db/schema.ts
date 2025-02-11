@@ -107,3 +107,17 @@ export const borrowHistory = pgTable("borrow_history", {
     .notNull()
     .defaultNow(),
 });
+
+export const cart = pgTable("cart", {
+  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id), // A cart belongs to a user
+  bookId: uuid("book_id")
+    .notNull()
+    .references(() => books.id), // Each book in the cart
+  quantity: integer("quantity").notNull().default(1), // Number of copies of the book
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+  }).defaultNow(),
+});

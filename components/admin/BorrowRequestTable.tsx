@@ -3,6 +3,7 @@
 // TODO:
 // if it is borrowed and today pass the due date, update the status to late - This should be done in BE using CRON job ideally
 // How to make sure admin dont send email to user more than once per hour?
+// refactor: need to refactor on how the pdf renderer component used, can it only be declared once instead in each rows?
 
 import React, { useState } from "react";
 import {

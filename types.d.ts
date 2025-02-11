@@ -1,5 +1,5 @@
 import { InferModel } from "drizzle-orm";
-import { borrowHistory, StatusEnum } from "./db/schema";
+import { borrowHistory, cart, StatusEnum } from "./db/schema";
 
 interface AuthCredentials {
   fullName: string;
@@ -58,3 +58,8 @@ type BorrowHistory = {
 };
 
 type BorrowHistory = InferModel<typeof borrowHistory>;
+
+type Cart = {
+  book: Book;
+  user: User;
+} & InferModel<typeof cart>;

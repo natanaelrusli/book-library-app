@@ -1,7 +1,7 @@
 import { db } from "@/db/drizzle";
 import { books, borrowHistory, users } from "@/db/schema";
 import { BorrowHistory, BorrowStatus } from "@/types";
-import { count, eq } from "drizzle-orm";
+import { count, eq, InferModel } from "drizzle-orm";
 
 interface GetBorrowHistoryarams {
   limit: number;
@@ -85,5 +85,46 @@ export const updateBorrowStatus = async ({
   } catch (error) {
     console.error("Failed to update borrow status:", error);
     throw new Error("Failed to update borrow status.");
+  }
+};
+
+type CreateBorrowRequestPayload = {
+  bookId: string;
+  userId: string;
+  borrowDate: Date;
+  dueDate: Date;
+};
+
+export type BorrowRequestInsert = InferModel<typeof borrowHistory, "insert">;
+
+export const createNewBorrowRequest = async ({
+  bookId,
+  userId,
+  borrowDate,
+  dueDate,
+}: CreateBorrowRequestPayload) => {
+  // Check availableCopies
+  // Decrease availableCopies when borrowed
+  // Increase back when the book returned
+  try {
+    const newRequest: BorrowRequestInsert = {
+      bookId,
+      userId,
+      borrowDate,
+      dueDate,
+      borrowStatus: "BORROWED",
+    };
+
+    const res = await db.insert(borrowHistory).values({ ...newRequest });
+
+    return {
+      success: true,
+      data: res,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+    };
   }
 };
