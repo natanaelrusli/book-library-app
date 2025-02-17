@@ -6,24 +6,78 @@ import { Minus, Plus, TrashIcon } from "lucide-react";
 import BookCover from "../BookCover";
 import { Button } from "../ui/button";
 import { Cart } from "@/types";
+import { toast } from "@/hooks/use-toast";
+import Spinner from "@/components/ui/spinner";
 
 type CartItemProps = {
   count?: number;
-  onRemove?: () => void;
+  onRemove?: (cartId: string) => Promise<void>;
   cart: Cart;
 };
 
-const CartItem = ({ count = 1, onRemove = () => {}, cart }: CartItemProps) => {
+const CartItem = ({
+  count = 1,
+  onRemove = async () => {},
+  cart,
+}: CartItemProps) => {
   const [itemCount, setItemCount] = useState<number>(count);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [isRemoving, setIsRemoving] = useState<boolean>(false);
   const { book } = cart;
 
-  const handleItemIncrease = () => {
-    setItemCount(itemCount + 1);
+  const removeCartItem = async ({ cartId }: { cartId: string }) => {
+    try {
+      setIsRemoving(true);
+      await onRemove(cartId);
+      toast({
+        title: "Success removing from cart",
+      });
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "Failed to remove cart item",
+      });
+    } finally {
+      setIsRemoving(false);
+    }
   };
 
-  const handleItemDecrease = () => {
+  const updateCartItem = async (cartId: string, quantity: number) => {
+    try {
+      setIsUpdating(true);
+      const response = await fetch("/api/cart/update", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cartId, quantity }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to update cart");
+      }
+
+      return data;
+    } catch (e) {
+      toast({
+        title: "Error updating cart",
+      });
+      console.error(e);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleItemIncrease = async () => {
+    setItemCount(itemCount + 1);
+    await updateCartItem(cart.id, itemCount + 1);
+  };
+
+  const handleItemDecrease = async () => {
     if (itemCount > 1) {
       setItemCount(itemCount - 1);
+      await updateCartItem(cart.id, itemCount - 1);
     }
   };
 
@@ -45,23 +99,34 @@ const CartItem = ({ count = 1, onRemove = () => {}, cart }: CartItemProps) => {
               variant="outline"
               size="sm"
               onClick={handleItemDecrease}
-              disabled={itemCount === 1}
+              disabled={itemCount === 1 || isUpdating}
             >
               <Minus />
             </Button>
             <Label>{itemCount}</Label>
-            <Button variant="outline" size="sm" onClick={handleItemIncrease}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleItemIncrease}
+              disabled={isUpdating}
+            >
               <Plus />
             </Button>
           </div>
         </div>
 
-        <button
+        <Button
+          size="sm"
           className="rounded-lg bg-white p-2 transition-all hover:bg-red hover:text-white"
-          onClick={onRemove}
+          onClick={() =>
+            removeCartItem({
+              cartId: cart.id,
+            })
+          }
+          disabled={isUpdating || isRemoving}
         >
-          <TrashIcon className="size-4" />
-        </button>
+          {isRemoving ? <Spinner /> : <TrashIcon className="size-4" />}
+        </Button>
       </div>
     </div>
   );
