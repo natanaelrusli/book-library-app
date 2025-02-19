@@ -2,6 +2,7 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { prisma } from "@/db/prisma";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Empty } from "antd";
 
@@ -32,10 +33,16 @@ const Page = async () => {
 
   return (
     <Card className="p-6">
-      <div className="mt-3 w-full border-b pb-6">
+      <div className="mt-3 flex w-full justify-between border-b pb-6">
         <Label className="text-3xl font-semibold">
           All Posts ({postsCount})
         </Label>
+
+        <Link href={"/blog/posts/create"}>
+          <Button className="bg-primary-admin text-white hover:bg-dark-100">
+            Create Post
+          </Button>
+        </Link>
       </div>
 
       <ul className="my-2">

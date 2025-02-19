@@ -20,6 +20,7 @@ import { createPost } from "@/lib/actions/post";
 import { createPostSchema } from "@/lib/validation";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useState } from "react";
+import Link from "next/link";
 
 const Page = () => {
   const form = useForm({
@@ -58,7 +59,14 @@ const Page = () => {
 
   return (
     <Card>
-      <Label className="text-2xl font-bold">Add New Post</Label>
+      <div className="flex flex-col gap-6">
+        <Link href="/blog/posts">
+          <Button className="w-fit border border-gray-200 bg-white hover:bg-white">
+            Back to Posts
+          </Button>
+        </Link>
+        <Label className="text-2xl font-bold">Add New Post</Label>
+      </div>
       <div className="mt-6">
         <Form {...form}>
           <form
@@ -107,7 +115,11 @@ const Page = () => {
               )}
             />
 
-            <Button type="submit" disabled={formStatus === "submitting"}>
+            <Button
+              className="bg-primary-admin text-white hover:bg-dark-100"
+              type="submit"
+              disabled={formStatus === "submitting"}
+            >
               {formStatus === "submitting" && (
                 <Spin
                   indicator={

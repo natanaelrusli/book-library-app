@@ -32,9 +32,15 @@ const PostPage = async ({ params: { id } }: PostPageProps) => {
 
       <hr />
 
-      <div className="mt-5 flex items-center gap-3 text-xs text-dark-700">
-        <Calendar className="size-4" />
-        <p>{formatDate(post?.createdAt || "")}</p>
+      <div className="mt-5 flex flex-col gap-4 text-xs text-dark-700">
+        <div className="flex gap-2">
+          <Calendar className="size-4" />
+          <p>{formatDate(post?.createdAt || "")}</p>
+        </div>
+
+        <Button className="w-fit">
+          <Link href={`/blog/posts/${id}/edit`}>Edit Post</Link>
+        </Button>
       </div>
     </Card>
   );
