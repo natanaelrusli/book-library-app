@@ -3,10 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { prisma } from "@/db/prisma";
 import Link from "next/link";
-import { Button, Empty, Input } from "antd";
-import { Textarea } from "@/components/ui/textarea";
-import TextArea from "antd/es/input/TextArea";
-import { createPost } from "@/lib/actions/post";
+import { Empty } from "antd";
 
 const Page = async () => {
   const posts = await prisma.post.findMany({
@@ -63,30 +60,6 @@ const Page = async () => {
           </li>
         ))}
       </ul>
-
-      <div className="mt-8">
-        <Label className="text-2xl font-bold">Add New Post</Label>
-        <div className="mt-3">
-          <form action={createPost} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-3">
-              <Label>Title</Label>
-              <Input name="title" type="text" />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label>Slug</Label>
-              <Input name="slug" type="text" />
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label>Content</Label>
-              <TextArea name="content" rows={5} />
-            </div>
-
-            <button className="w-fit rounded-lg border border-gray-400 px-4 py-2 transition-all duration-500 hover:shadow-md">
-              Create Post
-            </button>
-          </form>
-        </div>
-      </div>
     </Card>
   );
 };

@@ -29,3 +29,9 @@ export const createBookSchema = z.object({
   bookVideo: z.string(),
   bookSummary: z.string().trim().min(10),
 });
+
+export const createPostSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  slug: z.string().min(1, "Slug is required"),
+  content: z.string().min(20, "Content must be at least 20 characters"),
+});

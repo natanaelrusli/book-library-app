@@ -9,6 +9,7 @@ export const createPost = async (formData: FormData) => {
       title: formData.get("title") as string,
       slug: (formData.get("slug") as string).replace(/\s+/g, "-").toLowerCase(),
       content: formData.get("content") as string,
+      authorId: "cm79vsbcw0000kyjx1i1lpfix",
     },
   });
   revalidatePath("/blog/posts");
@@ -16,9 +17,7 @@ export const createPost = async (formData: FormData) => {
 
 export const editPost = async (formData: FormData, id: string) => {
   await prisma.post.update({
-    where: {
-      id,
-    },
+    where: { id },
     data: {
       title: formData.get("title") as string,
       slug: (formData.get("slug") as string).replace(/\s+/g, "-").toLowerCase(),
@@ -29,8 +28,6 @@ export const editPost = async (formData: FormData, id: string) => {
 
 export const deletePost = async (id: string) => {
   await prisma.post.delete({
-    where: {
-      id,
-    },
+    where: { id },
   });
 };
